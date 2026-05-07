@@ -1,57 +1,61 @@
 {
-  "_comment": "Fichier à pusher à la racine du repo GitHub Grominet95/jarvis-skills en tant que index.json",
-  "version": "1.0",
+  "version": "1.1",
   "updated_at": "2026-05-07",
   "skills": [
     {
       "name": "web-researcher",
       "version": "1.0.0",
       "author": "BarthH95",
-      "description": "Recherche web avancée avec synthèse et citations.",
+      "description": "Recherche web avancée avec synthèse structurée et citations sources.",
       "tags": ["research", "web", "search"],
       "path": "skills/web-researcher",
+      "requires_env": [],
       "requires_tools": ["browser"],
-      "requires_env": []
+      "requires_oauth": []
     },
     {
       "name": "youtube-analyzer",
       "version": "1.0.0",
       "author": "BarthH95",
-      "description": "Analyse les performances YouTube et suggère des améliorations.",
-      "tags": ["youtube", "analytics", "content"],
+      "description": "Analyse les performances YouTube et suggère des améliorations de contenu.",
+      "tags": ["youtube", "analytics", "content", "creator"],
       "path": "skills/youtube-analyzer",
+      "requires_env": ["YOUTUBE_API_KEY", "YOUTUBE_CHANNEL_ID"],
       "requires_tools": [],
-      "requires_env": ["YOUTUBE_API_KEY", "YOUTUBE_CHANNEL_ID"]
+      "requires_oauth": []
     },
     {
       "name": "impulsion-veille",
       "version": "1.0.0",
       "author": "BarthH95",
       "description": "Veille tech pour Impulsion — IA, hardware, maker.",
-      "tags": ["impulsion", "veille", "tech", "news"],
+      "tags": ["impulsion", "veille", "tech", "news", "ai", "hardware"],
       "path": "skills/impulsion-veille",
+      "requires_env": [],
       "requires_tools": ["browser"],
-      "requires_env": []
+      "requires_oauth": []
     },
     {
       "name": "bambulab-printer",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": "BarthH95",
-      "description": "Contrôle l'imprimante 3D BambuLab — slice STL, lancement et suivi d'impression via MQTT.",
-      "tags": ["3d-printing", "bambulab", "hardware", "maker"],
+      "description": "Contrôle une imprimante 3D BambuLab via MQTT — slice, impression, statut, annulation.",
+      "tags": ["hardware", "3d-print", "bambu"],
       "path": "skills/bambulab-printer",
+      "requires_env": ["PRINTER_IP", "PRINTER_SERIAL", "PRINTER_ACCESS_CODE"],
       "requires_tools": [],
-      "requires_env": ["PRINTER_IP", "PRINTER_SERIAL", "PRINTER_ACCESS_CODE"]
+      "requires_oauth": []
     },
     {
       "name": "fusion360",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": "BarthH95",
-      "description": "Contrôle Autodesk Fusion 360 via MCP HTTP — scripts Python API, lecture, undo/redo.",
-      "tags": ["fusion360", "cad", "3d-modeling", "maker"],
+      "description": "Contrôle Autodesk Fusion 360 via MCP — modélisation, scripts Python API, export STL.",
+      "tags": ["hardware", "cad", "3d", "fusion", "modeling"],
       "path": "skills/fusion360",
+      "requires_env": [],
       "requires_tools": [],
-      "requires_env": ["FUSION_ENABLED"]
+      "requires_oauth": []
     }
   ]
 }

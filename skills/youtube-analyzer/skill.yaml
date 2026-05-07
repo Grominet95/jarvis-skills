@@ -4,5 +4,8 @@ author: BarthH95
 description: Analyse les performances YouTube et suggère des améliorations de contenu.
 tags: [youtube, analytics, content, creator]
 jarvis_min_version: 3.0
+requires_env:
+  - YOUTUBE_API_KEY
+  - YOUTUBE_CHANNEL_ID
 requires_tools: []
-requires_env: [YOUTUBE_API_KEY, YOUTUBE_CHANNEL_ID]
+requires_oauth: []

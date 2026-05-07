@@ -1,14 +1,12 @@
 name: bambulab-printer
-version: 1.0.0
+version: 1.0.1
 author: BarthH95
-description: Contrôle l'imprimante 3D BambuLab — slice STL, lancement et suivi d'impression via MQTT.
-tags:
-  - 3d-printing
-  - bambulab
-  - hardware
-  - maker
-requires_tools: []
+description: Contrôle une imprimante 3D BambuLab via MQTT — slice, impression, statut, annulation.
+tags: [hardware, 3d-print, bambu]
+jarvis_min_version: 3.0
 requires_env:
   - PRINTER_IP
   - PRINTER_SERIAL
   - PRINTER_ACCESS_CODE
+requires_tools: []
+requires_oauth: []
