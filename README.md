@@ -34,5 +34,5 @@ Lis [CONTRIBUTING.md](CONTRIBUTING.md), le process est rapide.
 
 ## Communauté
 
-[![Discord](https://img.shields.io/badge/Discord-Le%20Labo-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/lien)
+[![Discord](https://img.shields.io/badge/Discord-Le%20Labo-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/rSZjtEeZJC)
 [![GitHub](https://img.shields.io/badge/GitHub-Jarvis%20OS-black?style=for-the-badge&logo=github)](https://github.com/Grominet95/jarvis-OS)
