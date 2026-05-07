@@ -1,0 +1,8 @@
+name: web-researcher
+version: 1.0.0
+author: BarthH95
+description: Recherche web avancée avec synthèse structurée et citations sources.
+tags: [research, web, search]
+jarvis_min_version: 3.0
+requires_tools: [browser]
+requires_env: []
