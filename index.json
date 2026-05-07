@@ -1,4 +1,5 @@
 {
+  "_comment": "Fichier à pusher à la racine du repo GitHub Grominet95/jarvis-skills en tant que index.json",
   "version": "1.0",
   "updated_at": "2026-05-07",
   "skills": [
@@ -6,7 +7,7 @@
       "name": "web-researcher",
       "version": "1.0.0",
       "author": "BarthH95",
-      "description": "Recherche web avancée avec synthèse structurée et citations sources.",
+      "description": "Recherche web avancée avec synthèse et citations.",
       "tags": ["research", "web", "search"],
       "path": "skills/web-researcher",
       "requires_tools": ["browser"],
@@ -17,7 +18,7 @@
       "version": "1.0.0",
       "author": "BarthH95",
       "description": "Analyse les performances YouTube et suggère des améliorations.",
-      "tags": ["youtube", "analytics", "content", "creator"],
+      "tags": ["youtube", "analytics", "content"],
       "path": "skills/youtube-analyzer",
       "requires_tools": [],
       "requires_env": ["YOUTUBE_API_KEY", "YOUTUBE_CHANNEL_ID"]
@@ -31,6 +32,26 @@
       "path": "skills/impulsion-veille",
       "requires_tools": ["browser"],
       "requires_env": []
+    },
+    {
+      "name": "bambulab-printer",
+      "version": "1.0.0",
+      "author": "BarthH95",
+      "description": "Contrôle l'imprimante 3D BambuLab — slice STL, lancement et suivi d'impression via MQTT.",
+      "tags": ["3d-printing", "bambulab", "hardware", "maker"],
+      "path": "skills/bambulab-printer",
+      "requires_tools": [],
+      "requires_env": ["PRINTER_IP", "PRINTER_SERIAL", "PRINTER_ACCESS_CODE"]
+    },
+    {
+      "name": "fusion360",
+      "version": "1.0.0",
+      "author": "BarthH95",
+      "description": "Contrôle Autodesk Fusion 360 via MCP HTTP — scripts Python API, lecture, undo/redo.",
+      "tags": ["fusion360", "cad", "3d-modeling", "maker"],
+      "path": "skills/fusion360",
+      "requires_tools": [],
+      "requires_env": ["FUSION_ENABLED"]
     }
   ]
 }

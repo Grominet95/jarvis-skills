@@ -1,0 +1,12 @@
+name: fusion360
+version: 1.0.0
+author: BarthH95
+description: Contrôle Autodesk Fusion 360 via MCP HTTP — scripts Python API, lecture, undo/redo.
+tags:
+  - fusion360
+  - cad
+  - 3d-modeling
+  - maker
+requires_tools: []
+requires_env:
+  - FUSION_ENABLED
