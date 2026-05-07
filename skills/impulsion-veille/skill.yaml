@@ -1,9 +1,0 @@
-name: impulsion-veille
-version: 1.0.0
-author: BarthH95
-description: Veille tech pour Impulsion — surveille les actus IA, hardware et maker.
-tags: [impulsion, veille, tech, news, ai, hardware]
-jarvis_min_version: 3.0
-requires_env: []
-requires_tools: [browser]
-requires_oauth: []

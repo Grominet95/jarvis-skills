@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "1.2",
   "updated_at": "2026-05-07",
   "skills": [
     {
@@ -25,21 +25,10 @@
       "requires_oauth": []
     },
     {
-      "name": "impulsion-veille",
-      "version": "1.0.0",
-      "author": "BarthH95",
-      "description": "Veille tech pour Impulsion — IA, hardware, maker.",
-      "tags": ["impulsion", "veille", "tech", "news", "ai", "hardware"],
-      "path": "skills/impulsion-veille",
-      "requires_env": [],
-      "requires_tools": ["browser"],
-      "requires_oauth": []
-    },
-    {
       "name": "bambulab-printer",
       "version": "1.0.1",
       "author": "BarthH95",
-      "description": "Contrôle une imprimante 3D BambuLab via MQTT — slice, impression, statut, annulation.",
+      "description": "Controle une imprimante 3D BambuLab via MQTT : slice, impression, statut, annulation.",
       "tags": ["hardware", "3d-print", "bambu"],
       "path": "skills/bambulab-printer",
       "requires_env": ["PRINTER_IP", "PRINTER_SERIAL", "PRINTER_ACCESS_CODE"],
@@ -50,7 +39,7 @@
       "name": "fusion360",
       "version": "1.0.1",
       "author": "BarthH95",
-      "description": "Contrôle Autodesk Fusion 360 via MCP — modélisation, scripts Python API, export STL.",
+      "description": "Controle Autodesk Fusion 360 via MCP : modelisation, scripts Python API, export STL.",
       "tags": ["hardware", "cad", "3d", "fusion", "modeling"],
       "path": "skills/fusion360",
       "requires_env": [],
