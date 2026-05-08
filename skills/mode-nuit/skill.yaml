@@ -1,0 +1,55 @@
+name: mode-nuit
+version: 1.0.0
+author: BarthH95
+description: Prépare la fin de journée — ferme les apps de travail, musique douce.
+tags: [routine, nuit, veille, fin-de-journee]
+type: routine
+triggers:
+  - "lance le mode nuit"
+  - "bonne nuit"
+  - "fin de journée"
+  - "je vais dormir"
+  - "on arrête pour ce soir"
+platforms: [mac, windows]
+requires_env: []
+requires_tools: [spotify_control, execute_cli]
+requires_oauth: []
+steps:
+
+  - name: Fermer VS Code
+    type: cli
+    platforms:
+      mac: "osascript -e 'quit app \"Visual Studio Code\"'"
+      windows: "taskkill /IM code.exe /F"
+      linux: "pkill code"
+
+  - name: Fermer Notion
+    type: cli
+    platforms:
+      mac: "osascript -e 'quit app \"Notion\"'"
+      windows: "taskkill /IM Notion.exe /F"
+      linux: null
+
+  - name: Musique douce
+    type: spotify
+    action: search_playlist
+    query: "chill evening wind down"
+
+  - name: Désactiver Ne pas déranger
+    type: cli
+    platforms:
+      mac: "osascript -e 'tell application \"System Events\" to set doNotDisturb to false'"
+      windows: "powershell -c \"Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\CloudStore\\Store\\DefaultAccount\\Current\\default$windows.data.notifications.quiethourssettings' -Force -ErrorAction SilentlyContinue\""
+      linux: null
+
+  - name: Message de fin
+    type: tts
+    text: "Bonne soirée Barth. À demain !"
+
+  - name: Bilan de journée
+    type: ai
+    prompt: >
+      C'est la fin de journée pour Barth. Donne-lui un bilan
+      motivant en 2 phrases : encourage-le sur ce qu'il a accompli
+      et donne-lui une seule chose à garder en tête pour demain.
+      Ton chaleureux, pas condescendant.

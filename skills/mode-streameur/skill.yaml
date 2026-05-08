@@ -1,0 +1,50 @@
+name: mode-streameur
+version: 1.0.0
+author: BarthH95
+description: Lance l'environnement stream — OBS, Spotify, Ne pas déranger.
+tags: [routine, stream, gaming, obs]
+type: routine
+triggers:
+  - "lance le mode streameur"
+  - "démarre le stream"
+  - "on stream"
+  - "je vais streamer"
+platforms: [mac, windows]
+requires_env: []
+requires_tools: [spotify_control, execute_cli]
+requires_oauth: []
+steps:
+
+  - name: Ouvrir OBS
+    type: cli
+    platforms:
+      mac: "open -a 'OBS'"
+      windows: "start obs64.exe"
+      linux: null
+
+  - name: Attendre OBS
+    type: wait
+    seconds: 2
+
+  - name: Lancer playlist stream
+    type: spotify
+    action: search_playlist
+    query: "lo-fi hip hop stream"
+
+  - name: Activer Ne pas déranger
+    type: cli
+    platforms:
+      mac: "osascript -e 'tell application \"System Events\" to set doNotDisturb to true'"
+      windows: "powershell -c \"$path = 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\CloudStore\\Store\\DefaultAccount\\Current\\default$windows.data.notifications.quiethourssettings'; New-Item -Path $path -Force\""
+      linux: null
+
+  - name: Message de confirmation
+    type: tts
+    text: "Mode streameur activé. Bonne session !"
+
+  - name: Suggestion de jeu
+    type: ai
+    prompt: >
+      Barth va streamer. Donne-lui une suggestion courte et motivante
+      sur quoi streamer ce soir — un jeu tendance, un projet maker,
+      ou une idée originale. Maximum 2 phrases, ton décontracté.

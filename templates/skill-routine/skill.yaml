@@ -1,0 +1,91 @@
+# ─────────────────────────────────────────────────────────────
+# TEMPLATE ROUTINE SKILL — jarvis-skills
+# Copier ce dossier dans skills/nom-de-ta-routine/
+# Renommer "name" et remplir tous les champs.
+# ─────────────────────────────────────────────────────────────
+
+# ── Metadata ──────────────────────────────────────────────────
+name: ma-routine                    # slug kebab-case unique, pas d'espaces
+version: 1.0.0
+author: ton-pseudo-github
+description: Ce que fait la routine en une phrase claire.
+tags: [routine, tag1, tag2]         # toujours inclure "routine" comme premier tag
+type: routine                       # OBLIGATOIRE pour les routines
+
+# ── Déclencheurs vocaux ───────────────────────────────────────
+# Phrases que l'utilisateur peut dire pour déclencher la routine.
+# Jarvis les reconnaît même si la formulation est légèrement différente.
+triggers:
+  - "phrase principale"
+  - "variante 1"
+  - "variante 2"
+
+# ── Compatibilité plateforme ──────────────────────────────────
+# Lister les plateformes supportées.
+# Valeurs possibles : mac, windows, linux
+# Si un step n'est pas supporté sur une plateforme, le mettre à null.
+platforms: [mac, windows]          # ne pas lister linux si non testé
+
+# ── Prérequis ─────────────────────────────────────────────────
+requires_env: []                    # variables .env nécessaires
+requires_tools: []                  # outils Jarvis nécessaires
+requires_oauth: []                  # connexions OAuth nécessaires
+
+# ── Steps ─────────────────────────────────────────────────────
+# Liste des actions à exécuter dans l'ordre.
+# Types disponibles : cli, spotify, tts, ai, wait, notify
+steps:
+
+  # ── Type : cli ──────────────────────────────────────────────
+  # Exécute une commande shell.
+  # Utiliser "platforms" pour les commandes qui diffèrent par OS.
+  # Si une plateforme est null → step skippé silencieusement.
+  - name: "Nom descriptif du step"
+    type: cli
+    platforms:
+      mac: "commande macOS ici"
+      windows: "commande Windows ici"
+      linux: null                   # null = non supporté = skippé
+
+  # ── Type : cli universel ────────────────────────────────────
+  # Si la commande est identique sur tous les OS.
+  - name: "Commande universelle"
+    type: cli
+    command: "commande identique sur tous les OS"
+
+  # ── Type : spotify ──────────────────────────────────────────
+  # Contrôle Spotify. Nécessite le tool spotify_control.
+  - name: "Lancer une playlist"
+    type: spotify
+    action: search_playlist         # search_playlist | search_track | play | pause | next
+    query: "Nom de la playlist"
+
+  # ── Type : tts ──────────────────────────────────────────────
+  # Jarvis dit quelque chose à voix haute.
+  - name: "Message vocal"
+    type: tts
+    text: "Ce que Jarvis dit."
+
+  # ── Type : ai ───────────────────────────────────────────────
+  # Appel LLM — Jarvis génère une réponse contextuelle et la dit.
+  # La réponse est aussi affichée dans l'interface.
+  - name: "Conseil IA"
+    type: ai
+    prompt: "Instruction pour Jarvis — contexte + ce qu'il doit faire."
+
+  # ── Type : wait ─────────────────────────────────────────────
+  # Pause entre deux steps.
+  - name: "Attendre"
+    type: wait
+    seconds: 2
+
+  # ── Type : notify ────────────────────────────────────────────
+  # Notification système (macOS/Windows).
+  - name: "Notification"
+    type: notify
+    title: "Titre de la notif"
+    body: "Corps de la notification."
+    platforms:
+      mac: true
+      windows: true
+      linux: null

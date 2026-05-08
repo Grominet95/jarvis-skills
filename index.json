@@ -1,50 +1,100 @@
 {
-  "version": "1.2",
-  "updated_at": "2026-05-07",
+  "version": "1.3",
+  "updated_at": "2026-05-08",
   "skills": [
     {
       "name": "web-researcher",
       "version": "1.0.0",
+      "type": "conversational",
       "author": "BarthH95",
       "description": "Recherche web avancée avec synthèse structurée et citations sources.",
       "tags": ["research", "web", "search"],
       "path": "skills/web-researcher",
       "requires_env": [],
       "requires_tools": ["browser"],
-      "requires_oauth": []
+      "requires_oauth": [],
+      "platforms": ["mac", "windows", "linux"]
     },
     {
       "name": "youtube-analyzer",
       "version": "1.0.0",
+      "type": "conversational",
       "author": "BarthH95",
-      "description": "Analyse les performances YouTube et suggère des améliorations de contenu.",
+      "description": "Analyse les performances YouTube et suggère des améliorations.",
       "tags": ["youtube", "analytics", "content", "creator"],
       "path": "skills/youtube-analyzer",
       "requires_env": ["YOUTUBE_API_KEY", "YOUTUBE_CHANNEL_ID"],
       "requires_tools": [],
-      "requires_oauth": []
+      "requires_oauth": [],
+      "platforms": ["mac", "windows", "linux"]
     },
     {
       "name": "bambulab-printer",
       "version": "1.0.1",
+      "type": "conversational",
       "author": "BarthH95",
-      "description": "Controle une imprimante 3D BambuLab via MQTT : slice, impression, statut, annulation.",
+      "description": "Contrôle une imprimante 3D BambuLab via MQTT.",
       "tags": ["hardware", "3d-print", "bambu"],
       "path": "skills/bambulab-printer",
       "requires_env": ["PRINTER_IP", "PRINTER_SERIAL", "PRINTER_ACCESS_CODE"],
       "requires_tools": [],
-      "requires_oauth": []
+      "requires_oauth": [],
+      "platforms": ["mac", "windows", "linux"]
     },
     {
       "name": "fusion360",
       "version": "1.0.1",
+      "type": "conversational",
       "author": "BarthH95",
-      "description": "Controle Autodesk Fusion 360 via MCP : modelisation, scripts Python API, export STL.",
-      "tags": ["hardware", "cad", "3d", "fusion", "modeling"],
+      "description": "Contrôle Autodesk Fusion 360 via MCP.",
+      "tags": ["hardware", "cad", "3d", "fusion"],
       "path": "skills/fusion360",
       "requires_env": [],
       "requires_tools": [],
-      "requires_oauth": []
+      "requires_oauth": [],
+      "platforms": ["mac", "windows"]
+    },
+    {
+      "name": "mode-streameur",
+      "version": "1.0.0",
+      "type": "routine",
+      "author": "BarthH95",
+      "description": "Lance l'environnement stream — OBS, Spotify, Ne pas déranger.",
+      "tags": ["routine", "stream", "gaming", "obs"],
+      "path": "skills/mode-streameur",
+      "requires_env": [],
+      "requires_tools": ["spotify_control", "execute_cli"],
+      "requires_oauth": [],
+      "platforms": ["mac", "windows"],
+      "triggers": ["lance le mode streameur", "démarre le stream", "on stream"]
+    },
+    {
+      "name": "mode-travail",
+      "version": "1.0.0",
+      "type": "routine",
+      "author": "BarthH95",
+      "description": "Lance l'environnement de travail — apps, musique focus, DND.",
+      "tags": ["routine", "travail", "focus", "productivite"],
+      "path": "skills/mode-travail",
+      "requires_env": [],
+      "requires_tools": ["spotify_control", "execute_cli"],
+      "requires_oauth": [],
+      "platforms": ["mac", "windows"],
+      "triggers": ["lance le mode travail", "mode focus", "on bosse"]
+    },
+    {
+      "name": "mode-nuit",
+      "version": "1.0.0",
+      "type": "routine",
+      "author": "BarthH95",
+      "description": "Prépare l'environnement nuit — ferme les apps, musique douce, rappels.",
+      "tags": ["routine", "nuit", "veille", "fin-de-journee"],
+      "path": "skills/mode-nuit",
+      "requires_env": [],
+      "requires_tools": ["spotify_control", "execute_cli"],
+      "requires_oauth": [],
+      "platforms": ["mac", "windows"],
+      "triggers": ["lance le mode nuit", "bonne nuit", "fin de journée", "je vais dormir"]
     }
   ]
 }

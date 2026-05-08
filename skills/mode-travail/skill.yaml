@@ -1,0 +1,54 @@
+name: mode-travail
+version: 1.0.0
+author: BarthH95
+description: Lance l'environnement de travail — apps, musique focus, Ne pas déranger.
+tags: [routine, travail, focus, productivite]
+type: routine
+triggers:
+  - "lance le mode travail"
+  - "mode focus"
+  - "on bosse"
+  - "je commence à travailler"
+  - "démarre la session de travail"
+platforms: [mac, windows]
+requires_env: []
+requires_tools: [spotify_control, execute_cli, notion_tasks]
+requires_oauth: []
+steps:
+
+  - name: Ouvrir Notion
+    type: cli
+    platforms:
+      mac: "open -a 'Notion'"
+      windows: "start notion.exe"
+      linux: null
+
+  - name: Ouvrir VS Code
+    type: cli
+    platforms:
+      mac: "open -a 'Visual Studio Code'"
+      windows: "start code.exe"
+      linux: "code &"
+
+  - name: Lancer musique focus
+    type: spotify
+    action: search_playlist
+    query: "deep focus coding"
+
+  - name: Activer Ne pas déranger
+    type: cli
+    platforms:
+      mac: "osascript -e 'tell application \"System Events\" to set doNotDisturb to true'"
+      windows: "powershell -c \"$path = 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\CloudStore\\Store\\DefaultAccount\\Current\\default$windows.data.notifications.quiethourssettings'; New-Item -Path $path -Force\""
+      linux: null
+
+  - name: Message de confirmation
+    type: tts
+    text: "Mode travail activé. Concentration maximale."
+
+  - name: Brief tâches du jour
+    type: ai
+    prompt: >
+      Barth commence une session de travail. Récupère ses tâches Notion
+      du jour et donne-lui un brief motivant en 2-3 phrases maximum.
+      Mentionne les 2-3 tâches les plus importantes. Sois direct et concis.

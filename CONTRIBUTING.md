@@ -67,4 +67,33 @@ et vérifie que Jarvis se comporte correctement.
 
 ## Questions ?
 
-Discord Le Labo : [lien]
+Discord Le Labo : https://discord.gg/rSZjtEeZJC
+
+---
+
+## Contribuer une routine
+
+Une routine est un skill qui déclenche une séquence d'actions concrètes sur la machine de l'utilisateur.
+
+### Utiliser le template
+
+```bash
+cp -r templates/skill-routine/ skills/ma-routine/
+```
+
+### Règles importantes
+
+1. `type: routine` obligatoire dans skill.yaml
+2. `"routine"` doit être le premier tag
+3. Tester sur toutes les plateformes déclarées dans `platforms`
+4. Mettre `null` pour les plateformes non testées
+5. Pas de commandes destructives sans `requires_confirmation: true`
+6. Mettre à jour `index.json` avec `"type": "routine"`
+
+### Checklist PR
+
+- [ ] skill.yaml valide avec type: routine
+- [ ] Testé sur mac OU windows (selon platforms déclaré)
+- [ ] Aucune commande destructive non confirmée
+- [ ] index.json mis à jour
+- [ ] skill.py minimal avec classe héritant de RoutineSkill
