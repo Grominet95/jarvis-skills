@@ -71,29 +71,29 @@ Discord Le Labo : https://discord.gg/rSZjtEeZJC
 
 ---
 
-## Contribuer une routine
+## Contribuer une preset
 
-Une routine est un skill qui déclenche une séquence d'actions concrètes sur la machine de l'utilisateur.
+Une preset est un skill qui déclenche une séquence d'actions concrètes sur la machine de l'utilisateur.
 
 ### Utiliser le template
 
 ```bash
-cp -r templates/skill-routine/ skills/ma-routine/
+cp -r templates/skill-preset/ skills/ma-preset/
 ```
 
 ### Règles importantes
 
-1. `type: routine` obligatoire dans skill.yaml
-2. `"routine"` doit être le premier tag
+1. `type: preset` obligatoire dans skill.yaml
+2. `"preset"` doit être le premier tag
 3. Tester sur toutes les plateformes déclarées dans `platforms`
 4. Mettre `null` pour les plateformes non testées
 5. Pas de commandes destructives sans `requires_confirmation: true`
-6. Mettre à jour `index.json` avec `"type": "routine"`
+6. Mettre à jour `index.json` avec `"type": "preset"`
 
 ### Checklist PR
 
-- [ ] skill.yaml valide avec type: routine
+- [ ] skill.yaml valide avec type: preset
 - [ ] Testé sur mac OU windows (selon platforms déclaré)
 - [ ] Aucune commande destructive non confirmée
 - [ ] index.json mis à jour
-- [ ] skill.py minimal avec classe héritant de RoutineSkill
+- [ ] skill.py minimal avec classe héritant de PresetSkill

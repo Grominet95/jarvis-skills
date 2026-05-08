@@ -2,8 +2,8 @@ name: mode-travail
 version: 1.0.0
 author: BarthH95
 description: Lance l'environnement de travail — apps, musique focus, Ne pas déranger.
-tags: [routine, travail, focus, productivite]
-type: routine
+tags: [preset, travail, focus, productivite]
+type: preset
 triggers:
   - "lance le mode travail"
   - "mode focus"

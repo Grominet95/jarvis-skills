@@ -3,7 +3,7 @@
 [![Jarvis](https://img.shields.io/badge/Jarvis-OS-black?style=for-the-badge&logo=github)](https://github.com/Grominet95/jarvis-OS)
 [![License](https://img.shields.io/badge/Licence-MIT-blue?style=for-the-badge)](LICENSE)
 [![Skills](https://img.shields.io/badge/Skills-4-brightgreen?style=for-the-badge)](#skills-conversationnels)
-[![Routines](https://img.shields.io/badge/Routines-3-purple?style=for-the-badge)](#routines)
+[![Presets](https://img.shields.io/badge/Presets-3-purple?style=for-the-badge)](#presets)
 [![Contribuer](https://img.shields.io/badge/Contribuer-un%20skill-orange?style=for-the-badge)](CONTRIBUTING.md)
 
 Bibliothèque communautaire de skills pour [Jarvis](https://github.com/Grominet95/jarvis-OS), l'assistant IA personnel open source.
@@ -15,9 +15,9 @@ Il enseigne à Jarvis comment se comporter dans un contexte précis : recherche 
 
 Techniquement c'est un fichier Python avec un `SYSTEM_PROMPT` qui s'injecte automatiquement dans le contexte de Jarvis.
 
-## Qu'est-ce qu'une routine ?
+## Qu'est-ce qu'une preset ?
 
-Une routine est un skill spécial qui déclenche une **séquence d'actions concrètes** sur la machine de l'utilisateur : ouvrir des apps, contrôler Spotify, activer Ne pas déranger, faire parler Jarvis, appeler un LLM.
+Une preset est un skill spécial qui déclenche une **séquence d'actions concrètes** sur la machine de l'utilisateur : ouvrir des apps, contrôler Spotify, activer Ne pas déranger, faire parler Jarvis, appeler un LLM.
 
 ## Installer un skill
 
@@ -34,9 +34,9 @@ Dans Jarvis, ouvre **Paramètres > Marketplace**, recherche le skill et clique *
 | [bambulab-printer](skills/bambulab-printer/) | Contrôle imprimante BambuLab via MQTT | - | PRINTER_IP, PRINTER_SERIAL, PRINTER_ACCESS_CODE |
 | [fusion360](skills/fusion360/) | Contrôle Fusion 360 via MCP : scripts Python API, export STL | - | - |
 
-### Routines
+### Presets
 
-| Routine | Description | Auteur | Plateformes |
+| Preset | Description | Auteur | Plateformes |
 |---------|-------------|--------|-------------|
 | [mode-streameur](skills/mode-streameur/) | Env. stream — OBS, Spotify, DND | BarthH95 | mac, windows |
 | [mode-travail](skills/mode-travail/) | Env. travail — Notion, VS Code, focus | BarthH95 | mac, windows |

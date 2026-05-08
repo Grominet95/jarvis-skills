@@ -1,19 +1,19 @@
 # ─────────────────────────────────────────────────────────────
-# TEMPLATE ROUTINE SKILL — jarvis-skills
-# Copier ce dossier dans skills/nom-de-ta-routine/
+# TEMPLATE PRESET SKILL — jarvis-skills
+# Copier ce dossier dans skills/nom-de-ta-preset/
 # Renommer "name" et remplir tous les champs.
 # ─────────────────────────────────────────────────────────────
 
 # ── Metadata ──────────────────────────────────────────────────
-name: ma-routine                    # slug kebab-case unique, pas d'espaces
+name: ma-preset                    # slug kebab-case unique, pas d'espaces
 version: 1.0.0
 author: ton-pseudo-github
-description: Ce que fait la routine en une phrase claire.
-tags: [routine, tag1, tag2]         # toujours inclure "routine" comme premier tag
-type: routine                       # OBLIGATOIRE pour les routines
+description: Ce que fait la preset en une phrase claire.
+tags: [preset, tag1, tag2]         # toujours inclure "preset" comme premier tag
+type: preset                       # OBLIGATOIRE pour les presets
 
 # ── Déclencheurs vocaux ───────────────────────────────────────
-# Phrases que l'utilisateur peut dire pour déclencher la routine.
+# Phrases que l'utilisateur peut dire pour déclencher la preset.
 # Jarvis les reconnaît même si la formulation est légèrement différente.
 triggers:
   - "phrase principale"

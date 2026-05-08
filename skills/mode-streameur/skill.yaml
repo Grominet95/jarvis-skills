@@ -2,8 +2,8 @@ name: mode-streameur
 version: 1.0.0
 author: BarthH95
 description: Lance l'environnement stream — OBS, Spotify, Ne pas déranger.
-tags: [routine, stream, gaming, obs]
-type: routine
+tags: [preset, stream, gaming, obs]
+type: preset
 triggers:
   - "lance le mode streameur"
   - "démarre le stream"
