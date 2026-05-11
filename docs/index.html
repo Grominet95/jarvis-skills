@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>jarvis-skills · Étends les capacités de Jarvis</title>
+  <meta name="description" content="Marketplace public de skills et presets pour Jarvis. Installe en une phrase." />
+  <meta name="theme-color" content="#06080D" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="_shared.css" />
+  <link rel="stylesheet" href="site.css" />
+  <link rel="stylesheet" href="site.list.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="site.detail.css" />
+  <link rel="stylesheet" href="site.boost.css" />
+
+  <style>
+    /* Reset shell-only rules from _shared.css that don't apply on a vitrine */
+    html, body { height: auto; overflow: auto; }
+    body { background: var(--bg-0); }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <div class="nav-l">
+        <a href="#/" class="nav-brand-link">
+          <span class="nav-brand-text">Jarvis</span>
+        </a>
+      </div>
+      <div class="nav-c">
+        <span class="dot"></span>
+        <span>CATALOGUE PUBLIC</span>
+      </div>
+      <div class="nav-r">
+        <a href="https://github.com/Grominet95/jarvis-skills" target="_blank" rel="noopener">
+          <span>Repo</span><span class="arr">↗</span>
+        </a>
+        <a href="https://github.com/Grominet95/jarvis-skills/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">
+          <span>Contribuer</span><span class="arr">↗</span>
+        </a>
+      </div>
+    </div>
+    <div class="wrap nav-sub">
+      <nav class="nav-cats" aria-label="Sections">
+        <a href="#/" class="nav-cat" data-cat="home">Accueil</a>
+        <a href="#/skills" class="nav-cat" data-cat="skill">Skills</a>
+        <a href="#/presets" class="nav-cat" data-cat="preset">Presets</a>
+        <a href="https://github.com/Grominet95/jarvis-skills" target="_blank" rel="noopener" class="nav-cat" data-cat="repo">Repo<span class="nav-cat-arr">↗</span></a>
+        <a href="#/about" class="nav-cat" data-cat="about">À propos</a>
+      </nav>
+      <div class="nav-meta">
+        <span class="nav-tick">v<span id="nav-version">—</span></span>
+        <span class="nav-pipe"></span>
+        <span class="nav-tick">MAJ <span id="nav-updated">—</span></span>
+        <span class="nav-pipe"></span>
+        <span class="nav-tick is-live"><span class="dot"></span>github/main</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="app"></main>
+
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  <script src="data.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

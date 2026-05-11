@@ -1,0 +1,142 @@
+/* jarvis-skills.com — site vitrine
+   Stacked ON TOP of _shared.css (Jarvis DS).
+   Le site est full-bleed (pas de sidebar/topbar de l'app shell). */
+
+html, body { overflow-x: hidden; }
+body { overflow-y: auto; }
+
+/* ────────────────────────────────────────────────────────
+   Atmosphère — couches fixes (aurora + grain + vignette)
+   On a déjà .atmo--* dans _shared.css, on les pose en body.
+   ──────────────────────────────────────────────────────── */
+body::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(80vw 60vh at 12% -10%, rgba(74,158,255,.10), transparent 60%),
+    radial-gradient(60vw 50vh at 92% 110%, rgba(184,150,62,.05), transparent 60%);
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 50% 40%, transparent 50%, #000 130%);
+  opacity: 0.55;
+}
+
+.grain {
+  position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  opacity: 0.035; mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.86  0 0 0 0 0.91  0 0 0 0 1  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ────────────────────────────────────────────────────────
+   Layout général
+   ──────────────────────────────────────────────────────── */
+.wrap {
+  position: relative; z-index: 2;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ────── Top nav ────── */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(6,8,13,0.72);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-bottom: 1px solid var(--line-1);
+}
+.nav-inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: 58px;
+}
+.nav-l {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: 0.16em; color: var(--fg-3);
+  text-transform: uppercase;
+}
+.nav-l a {
+  color: var(--fg-0); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.nav-mark {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #6BB0FF, #1B4F8C 60%, #06080D 100%);
+  box-shadow: 0 0 0 1px rgba(74,158,255,.35), 0 0 12px -2px rgba(74,158,255,.4);
+  animation: navMarkPulse 4.2s ease-in-out infinite;
+}
+@keyframes navMarkPulse {
+  0%,100% { box-shadow: 0 0 0 1px rgba(74,158,255,.35), 0 0 12px -2px rgba(74,158,255,.4); }
+  50%     { box-shadow: 0 0 0 1px rgba(74,158,255,.55), 0 0 24px -2px rgba(74,158,255,.7); }
+}
+.nav-brand-text { font-family: var(--serif); font-weight: 400; font-size: 14px; letter-spacing: -0.005em; color: var(--fg-0); text-transform: none; }
+.nav-brand-text .slash { color: var(--fg-3); margin: 0 6px; }
+.nav-brand-text .sub { color: var(--fg-2); }
+.nav-c {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em;
+  color: var(--fg-3); text-transform: uppercase;
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-c .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
+.nav-r {
+  display: flex; align-items: center; gap: 8px; justify-content: flex-end;
+}
+.nav-r a {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em;
+  color: var(--fg-2); text-decoration: none; text-transform: uppercase;
+  padding: 7px 12px; border: 1px solid var(--line-2); border-radius: 8px;
+  transition: all .15s ease;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.nav-r a:hover { color: var(--fg-0); border-color: var(--line-3); background: rgba(220,232,255,.04); }
+.nav-r a .arr { color: var(--fg-3); transition: transform .15s ease; }
+.nav-r a:hover .arr { color: var(--accent); transform: translateX(2px); }
+
+/* Sub-nav (categories) — boutique feel */
+.nav {
+  /* container becomes column so we can stack the sub row */
+}
+.nav-sub {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; height: 40px;
+  border-top: 1px solid var(--line-1);
+  margin-top: 0;
+}
+.nav-cats {
+  display: flex; align-items: center; gap: 2px;
+  margin-left: -10px;
+}
+.nav-cat {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--fg-2); text-decoration: none;
+  padding: 8px 10px; border-radius: 4px;
+  position: relative;
+  transition: color .15s ease, background .15s ease;
+}
+.nav-cat:hover { color: var(--fg-0); background: rgba(220,232,255,.03); }
+.nav-cat.is-on { color: var(--fg-0); }
+.nav-cat.is-on::after {
+  content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px;
+  height: 1px; background: var(--accent);
+}
+.nav-meta {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--fg-3);
+}
+.nav-meta .nav-tick { display: inline-flex; align-items: center; gap: 6px; }
+.nav-meta .nav-pipe { width: 1px; height: 10px; background: var(--line-2); }
+.nav-meta .is-live { color: var(--fg-2); }
+.nav-meta .is-live .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px var(--green);
+  animation: navpulse 2s ease-in-out infinite;
+}
+@keyframes navpulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+@media (max-width: 760px) {
+  .nav-sub { display: none; }
+}

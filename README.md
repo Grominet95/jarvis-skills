@@ -1,5 +1,6 @@
 # Jarvis Skills
 
+[![Site vitrine](https://img.shields.io/badge/Site-Vitrine-00b4d8?style=for-the-badge&logo=githubpages&logoColor=white)](https://grominet95.github.io/jarvis-skills/)
 [![Jarvis](https://img.shields.io/badge/Jarvis-OS-black?style=for-the-badge&logo=github)](https://github.com/Grominet95/jarvis-OS)
 [![License](https://img.shields.io/badge/Licence-MIT-blue?style=for-the-badge)](LICENSE)
 [![Skills](https://img.shields.io/badge/Skills-4-brightgreen?style=for-the-badge)](#skills-conversationnels)
@@ -46,6 +47,12 @@ Dans Jarvis, ouvre **Paramètres > Marketplace**, recherche le skill et clique *
 
 Tu veux ajouter une capacité à Jarvis et la partager ?
 Lis [CONTRIBUTING.md](CONTRIBUTING.md), le process est rapide.
+
+## Site vitrine
+
+Le catalogue est consultable en ligne sur **[https://grominet95.github.io/jarvis-skills/](https://grominet95.github.io/jarvis-skills/)**.
+
+Le site est statique (HTML/CSS/JS vanilla, hébergé via GitHub Pages) et affiche en temps réel les skills et presets depuis `index.json`.
 
 ## Communauté
 
