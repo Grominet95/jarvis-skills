@@ -13,6 +13,19 @@ platforms: [mac, windows]
 requires_env: []
 requires_tools: [execute_cli]
 requires_oauth: []
+requires_apps:
+  - name: OBS Studio
+    description: "Logiciel de streaming — doit être installé"
+    url: https://obsproject.com
+    mac_bundle: "OBS"
+    windows_exe: "obs64.exe"
+    required: true
+capabilities:
+  - "Ouvre OBS Studio automatiquement"
+  - "Ouvre le dashboard Twitch dans le navigateur"
+  - "Active le mode Ne pas déranger sur macOS et Windows"
+  - "Recommande un jeu à streamer et ouvre sa page Steam"
+  - "Souhaite bonne session avec message vocal"
 steps:
 
   - name: Ouvrir OBS

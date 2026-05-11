@@ -29,8 +29,15 @@ version: 1.0.0
 author: ton-pseudo-github
 description: Ce que fait le skill en une phrase claire.
 tags: [tag1, tag2]
+type: conversational
+platforms: [mac, windows, linux]
 requires_tools: []
 requires_env: []
+requires_apps: []
+capabilities:
+  - "Fait quelque chose d'utile"
+  - "Récupère des données depuis une source"
+  - "Génère un résultat concret"
 ```
 
 ### 4. Crée `skill.py`
@@ -56,6 +63,32 @@ et vérifie que Jarvis se comporte correctement.
 
 - Ajoute ton skill dans `index.json`
 - Ouvre la PR avec le template fourni
+
+### Champs requires_apps
+
+Si ton skill ou preset nécessite une application tierce installée :
+
+```yaml
+requires_apps:
+  - name: Nom de l'application
+    description: "Pourquoi elle est nécessaire"
+    url: https://lien-de-telechargement.com
+    mac_bundle: "NomApp"      # nom dans /Applications/
+    windows_exe: "app.exe"    # nom du process Windows
+    required: true            # true = bloquant, false = optionnel
+```
+
+### Champ capabilities
+
+Liste ce que le skill peut faire, en français, en langage naturel.
+Maximum 6 points. Chaque point commence par un verbe à la 3ème personne.
+
+```yaml
+capabilities:
+  - "Fait quelque chose d'utile"
+  - "Récupère des données depuis une source"
+  - "Génère un résultat concret"
+```
 
 ## Règles
 

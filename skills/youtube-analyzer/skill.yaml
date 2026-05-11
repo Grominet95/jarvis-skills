@@ -1,11 +1,20 @@
 name: youtube-analyzer
-version: 1.0.0
+version: 1.1.0
 author: BarthH95
-description: Analyse les performances YouTube et suggère des améliorations de contenu.
+description: Analyse les performances YouTube et suggère des améliorations.
 tags: [youtube, analytics, content, creator]
+type: conversational
 jarvis_min_version: 3.0
+triggers: []
+platforms: [mac, windows, linux]
 requires_env:
   - YOUTUBE_API_KEY
   - YOUTUBE_CHANNEL_ID
 requires_tools: []
 requires_oauth: []
+requires_apps: []
+capabilities:
+  - "Récupère le nombre d'abonnés et les vues totales de la chaîne"
+  - "Liste les 5 dernières vidéos publiées avec leurs performances"
+  - "Compare les vidéos entre elles pour identifier les formats qui marchent"
+  - "Suggère des sujets basés sur les tendances de la chaîne"

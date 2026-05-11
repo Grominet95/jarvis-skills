@@ -1,5 +1,5 @@
 name: mode-travail
-version: 1.0.0
+version: 1.1.0
 author: BarthH95
 description: Lance l'environnement de travail — apps, musique focus, Ne pas déranger.
 tags: [preset, travail, focus, productivite]
@@ -14,6 +14,24 @@ platforms: [mac, windows]
 requires_env: []
 requires_tools: [spotify_control, execute_cli, notion_tasks]
 requires_oauth: []
+requires_apps:
+  - name: Notion
+    description: "Application Notion desktop"
+    url: https://www.notion.so/desktop
+    mac_bundle: "Notion"
+    windows_exe: "Notion.exe"
+    required: false
+  - name: Visual Studio Code
+    description: "Éditeur de code"
+    url: https://code.visualstudio.com
+    mac_bundle: "Visual Studio Code"
+    windows_exe: "code.exe"
+    required: false
+capabilities:
+  - "Ouvre Notion et VS Code"
+  - "Lance une playlist Spotify deep focus"
+  - "Active le mode Ne pas déranger"
+  - "Fait un brief vocal des tâches Notion du jour"
 steps:
 
   - name: Ouvrir Notion

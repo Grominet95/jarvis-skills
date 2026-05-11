@@ -1,9 +1,28 @@
 name: fusion360
-version: 1.0.1
+version: 1.1.0
 author: BarthH95
-description: Contrôle Autodesk Fusion 360 via MCP — modélisation 3D, scripts Python API, export STL.
-tags: [hardware, cad, 3d, fusion, modeling]
+description: Contrôle Autodesk Fusion 360 via MCP — modélisation 3D, scripts, export STL.
+tags: [hardware, cad, 3d, fusion, design]
+type: conversational
 jarvis_min_version: 3.0
+triggers: []
+platforms: [mac, windows]
 requires_env: []
 requires_tools: []
 requires_oauth: []
+requires_apps:
+  - name: Autodesk Fusion 360
+    description: "Doit être ouvert avec l'add-in FusionMCP actif (Shift+S → Add-Ins → FusionMCP → Run)"
+    url: https://www.autodesk.com/products/fusion-360
+    required: true
+  - name: Add-in FusionMCP
+    description: "Add-in à installer dans Fusion 360 pour la connexion MCP (port 27182)"
+    url: https://github.com/faust-machines/fusion360-mcp-server
+    required: true
+capabilities:
+  - "Crée des géométries 3D via scripts Python Fusion API (boîtes, cylindres, formes complexes)"
+  - "Modifie des designs existants (congés, chanfreins, coupes)"
+  - "Lit les dimensions et propriétés du document actif"
+  - "Exporte des corps en STL pour impression 3D"
+  - "Annule et refait les dernières actions"
+  - "Capture une screenshot de la vue actuelle"

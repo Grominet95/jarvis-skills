@@ -1,9 +1,18 @@
 name: web-researcher
-version: 1.0.0
+version: 1.1.0
 author: BarthH95
 description: Recherche web avancée avec synthèse structurée et citations sources.
 tags: [research, web, search]
+type: conversational
 jarvis_min_version: 3.0
+triggers: []
+platforms: [mac, windows, linux]
 requires_env: []
 requires_tools: [browser]
 requires_oauth: []
+requires_apps: []
+capabilities:
+  - "Recherche sur le web avec DuckDuckGo ou Google"
+  - "Synthétise les résultats en 2-3 paragraphes clairs"
+  - "Cite systématiquement les sources avec leurs URLs"
+  - "Indique la fraîcheur des informations trouvées"

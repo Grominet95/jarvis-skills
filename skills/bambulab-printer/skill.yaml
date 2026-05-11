@@ -1,12 +1,39 @@
 name: bambulab-printer
-version: 1.0.1
+version: 1.1.0
 author: BarthH95
-description: Contrôle une imprimante 3D BambuLab via MQTT — slice, impression, statut, annulation.
+description: Contrôle une imprimante 3D BambuLab via MQTT.
 tags: [hardware, 3d-print, bambu]
+type: conversational
 jarvis_min_version: 3.0
+triggers: []
+platforms: [mac, windows, linux]
 requires_env:
-  - PRINTER_IP
-  - PRINTER_SERIAL
-  - PRINTER_ACCESS_CODE
+  - name: PRINTER_IP
+    description: "Adresse IP locale de la BambuLab (ex: 192.168.1.42)"
+    example: "192.168.1.42"
+    sensitive: false
+  - name: PRINTER_SERIAL
+    description: "Numéro de série de l'imprimante (dans Bambu Studio → Settings → Printer)"
+    example: "01P00A123456789"
+    sensitive: false
+  - name: PRINTER_ACCESS_CODE
+    description: "Code d'accès à 8 chiffres (dans Bambu Studio → Settings → Printer)"
+    example: "12345678"
+    sensitive: true
 requires_tools: []
 requires_oauth: []
+requires_apps:
+  - name: Bambu Studio
+    description: "Logiciel officiel BambuLab requis pour récupérer les identifiants"
+    url: https://bambulab.com/en/download/studio
+    required: false
+  - name: OrcaSlicer
+    description: "Slicer recommandé pour préparer les fichiers STL"
+    url: https://github.com/SoftFever/OrcaSlicer
+    required: false
+capabilities:
+  - "Vérifie l'état de l'imprimante (idle, impression en cours, erreur)"
+  - "Lance une impression depuis un fichier G-code existant"
+  - "Suit la progression d'une impression (pourcentage, temps restant)"
+  - "Annule une impression en cours"
+  - "Slice un fichier STL avec OrcaSlicer avant impression"
