@@ -1,7 +1,7 @@
 name: mode-travail
 version: 1.1.0
 author: BarthH95
-description: Lance l'environnement de travail — apps, musique focus, Ne pas déranger.
+description: Lance l'environnement de travail : apps, musique focus, Ne pas déranger.
 tags: [preset, travail, focus, productivite]
 type: preset
 triggers:

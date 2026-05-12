@@ -1,4 +1,4 @@
-// jarvis-skills — embedded fallback catalog (mirror of GitHub index.json + skill.yaml details)
+// jarvis-skills : embedded fallback catalog (mirror of GitHub index.json + skill.yaml details)
 // Live data is fetched first; this acts as fallback if GitHub fetch fails.
 window.JARVIS_FALLBACK = {
   version: "1.3",
@@ -21,7 +21,7 @@ window.JARVIS_FALLBACK = {
     },
     {
       name: "bambulab-printer", version: "1.0.1", type: "skill", author: "BarthH95",
-      description: "Contrôle une imprimante 3D BambuLab via MQTT — slice, impression, statut, annulation.",
+      description: "Contrôle une imprimante 3D BambuLab via MQTT : slice, impression, statut, annulation.",
       tags: ["hardware", "3d-print", "bambu"], path: "skills/bambulab-printer",
       requires_env: ["PRINTER_IP", "PRINTER_SERIAL", "PRINTER_ACCESS_CODE"],
       requires_tools: [], requires_oauth: [],
@@ -29,14 +29,14 @@ window.JARVIS_FALLBACK = {
     },
     {
       name: "fusion360", version: "1.0.1", type: "skill", author: "BarthH95",
-      description: "Contrôle Autodesk Fusion 360 via MCP — modélisation 3D, scripts Python API, export STL.",
+      description: "Contrôle Autodesk Fusion 360 via MCP : modélisation 3D, scripts Python API, export STL.",
       tags: ["hardware", "cad", "3d", "fusion", "modeling"], path: "skills/fusion360",
       requires_env: [], requires_tools: [], requires_oauth: [],
       platforms: ["mac", "windows"]
     },
     {
       name: "mode-streameur", version: "2.0.0", type: "preset", author: "BarthH95",
-      description: "Lance l'environnement stream — OBS, Ne pas déranger, Twitch, recommandation de jeu.",
+      description: "Lance l'environnement stream : OBS, Ne pas déranger, Twitch, recommandation de jeu.",
       tags: ["preset", "stream", "gaming", "obs", "twitch"], path: "skills/mode-streameur",
       requires_env: [], requires_tools: ["execute_cli"], requires_oauth: [],
       platforms: ["mac", "windows"],
@@ -44,7 +44,7 @@ window.JARVIS_FALLBACK = {
     },
     {
       name: "mode-travail", version: "1.0.0", type: "preset", author: "BarthH95",
-      description: "Lance l'environnement de travail — apps, musique focus, Ne pas déranger.",
+      description: "Lance l'environnement de travail : apps, musique focus, Ne pas déranger.",
       tags: ["preset", "travail", "focus", "productivite"], path: "skills/mode-travail",
       requires_env: [], requires_tools: ["spotify_control", "execute_cli", "notion_tasks"], requires_oauth: [],
       platforms: ["mac", "windows"],
@@ -52,7 +52,7 @@ window.JARVIS_FALLBACK = {
     },
     {
       name: "mode-nuit", version: "1.0.0", type: "preset", author: "BarthH95",
-      description: "Prépare la fin de journée — ferme les apps de travail, musique douce.",
+      description: "Prépare la fin de journée : ferme les apps de travail, musique douce.",
       tags: ["preset", "nuit", "veille", "fin-de-journee"], path: "skills/mode-nuit",
       requires_env: [], requires_tools: ["spotify_control", "execute_cli"], requires_oauth: [],
       platforms: ["mac", "windows"],
@@ -104,7 +104,7 @@ window.JARVIS_CAPABILITIES = {
   ]
 };
 
-// Required external apps (for presets) — surfaced on the card and detail page.
+// Required external apps (for presets) : surfaced on the card and detail page.
 window.JARVIS_REQUIRES_APPS = {
   "mode-streameur": [
     { name: "OBS Studio", url: "https://obsproject.com/" },

@@ -1,7 +1,7 @@
 name: fusion360
 version: 1.1.0
 author: BarthH95
-description: Contrôle Autodesk Fusion 360 via MCP — modélisation 3D, scripts, export STL.
+description: Contrôle Autodesk Fusion 360 via MCP : modélisation 3D, scripts, export STL.
 tags: [hardware, cad, 3d, fusion, design]
 type: conversational
 jarvis_min_version: 3.0

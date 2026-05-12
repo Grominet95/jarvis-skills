@@ -1,7 +1,7 @@
 name: mode-nuit
 version: 1.1.0
 author: BarthH95
-description: Prépare la fin de journée — ferme les apps de travail, musique douce.
+description: Prépare la fin de journée : ferme les apps de travail, musique douce.
 tags: [preset, nuit, veille, fin-de-journee]
 type: preset
 triggers:

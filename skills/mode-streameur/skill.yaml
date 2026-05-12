@@ -1,7 +1,7 @@
 name: mode-streameur
 version: 2.0.0
 author: BarthH95
-description: Lance l'environnement stream — OBS, Ne pas déranger, Twitch, recommandation de jeu.
+description: Lance l'environnement stream : OBS, Ne pas déranger, Twitch, recommandation de jeu.
 tags: [preset, stream, gaming, obs, twitch]
 type: preset
 triggers:
@@ -15,7 +15,7 @@ requires_tools: [execute_cli]
 requires_oauth: []
 requires_apps:
   - name: OBS Studio
-    description: "Logiciel de streaming — doit être installé"
+    description: "Logiciel de streaming (doit être installé)"
     url: https://obsproject.com
     mac_bundle: "OBS"
     windows_exe: "obs64.exe"

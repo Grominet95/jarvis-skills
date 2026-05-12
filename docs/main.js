@@ -115,7 +115,7 @@ function renderAbout() {
         el("section", { class: "about-block" }, [
           el("div", { class: "about-num" }, "01"),
           el("h3", {}, "Le projet"),
-          el("p", {}, "jarvis-skills est un dépôt public de modules conversationnels et de routines orchestrées. Chaque skill encapsule une intention claire — une recherche, un contrôle, une analyse — et chaque preset enchaîne plusieurs skills derrière une phrase."),
+          el("p", {}, "jarvis-skills est un dépôt public de modules conversationnels et de routines orchestrées. Chaque skill est une intégration : il donne à Jarvis un nouveau contexte d'action. Chaque preset enchaîne plusieurs skills derrière une phrase."),
         ]),
         el("section", { class: "about-block" }, [
           el("div", { class: "about-num" }, "02"),
@@ -125,7 +125,7 @@ function renderAbout() {
         el("section", { class: "about-block" }, [
           el("div", { class: "about-num" }, "03"),
           el("h3", {}, "Contribuer"),
-          el("p", {}, "Le repo est ouvert. Tout le monde peut proposer un skill via pull request — un dossier, un skill.yaml, une logique Python. Le manifeste sert de source de vérité pour ce catalogue."),
+          el("p", {}, "Le repo est ouvert. Tout le monde peut proposer un skill via pull request : un dossier, un skill.yaml, une logique Python. Le manifeste sert de source de vérité pour ce catalogue."),
           el("a", { class: "btn-cta", href: "https://github.com/Grominet95/jarvis-skills/blob/main/CONTRIBUTING.md", target: "_blank", rel: "noopener" }, [
             document.createTextNode("Lire le guide"),
             el("span", { class: "arr" }, "↗"),
@@ -134,7 +134,7 @@ function renderAbout() {
         el("section", { class: "about-block" }, [
           el("div", { class: "about-num" }, "04"),
           el("h3", {}, "Stack"),
-          el("p", {}, "Vitrine statique en HTML/CSS/JS, alimentée en direct par index.json depuis github/main. Aucun backend, aucun cookie, aucune analytique. Le contenu est la source — pas le contraire."),
+          el("p", {}, "Vitrine statique en HTML/CSS/JS, alimentée en direct par index.json depuis github/main. Aucun backend, aucun cookie, aucune analytique. Le contenu est la source, pas la couche de présentation."),
         ]),
       ]),
       el("div", { class: "about-foot" }, [
@@ -180,8 +180,8 @@ async function renderSection({ kind }) {
         document.createTextNode(isP ? " complet en une phrase." : " par skill."),
       ]),
       el("p", { class: "sec-lead" }, isP
-        ? "Un preset enchaîne plusieurs skills derrière un trigger. Une phrase, plusieurs actions orchestrées."
-        : "Chaque skill encapsule une intention. Recherche, contrôle, analyse — Jarvis l'installe sur demande."
+        ? "Un preset orchestre une séquence d'actions sur ta machine. Lance la phrase, tout se configure."
+        : "Chaque skill est une intégration. Tu l'installes, Jarvis gagne une nouvelle capacité."
       ),
       el("div", { class: "sec-search" }, [
         el("span", { class: "sec-search-ico" }, "⌕"),
@@ -379,8 +379,8 @@ function buildFeaturedAside_unused_stub_DEPRECATED({ counts, authors, updated, v
   setTimeout(() => {
     const v = document.getElementById("nav-version");
     const u = document.getElementById("nav-updated");
-    if (v) v.textContent = version || "—";
-    if (u) u.textContent = updated || "—";
+    if (v) v.textContent = version || "";
+    if (u) u.textContent = updated || "";
   }, 0);
   return null;
 }
@@ -397,8 +397,8 @@ function buildFeaturedAside(ctx) {
   setTimeout(() => {
     const v = document.getElementById("nav-version");
     const u = document.getElementById("nav-updated");
-    if (v) v.textContent = ctx.version || "—";
-    if (u) u.textContent = ctx.updated || "—";
+    if (v) v.textContent = ctx.version || "";
+    if (u) u.textContent = ctx.updated || "";
     syncNavOn();
   }, 0);
   return el("aside", { class: "stats-col v-editorial" }, [
@@ -440,9 +440,9 @@ function renderAsideVariant(v, ctx) {
     return el("div", { class: "v-body" }, [
       el("div", { class: "sc-head" }, [
         el("span", { class: "sc-tick" }, "↳"),
-        el("span", {}, "Catalogue · " + (updated || "—")),
+        el("span", {}, "Catalogue · " + (updated || "")),
         el("span", { class: "sc-flex" }),
-        el("span", { class: "sc-v" }, "v" + (version || "—")),
+        el("span", { class: "sc-v" }, "v" + (version || "")),
       ]),
       el("ol", { class: "sc-list" },
         rows.map((r, i) => el("li", { class: "sc-row " + r.accentClass }, [
@@ -461,7 +461,7 @@ function renderAsideVariant(v, ctx) {
     return el("div", { class: "v-body poster" }, [
       el("div", { class: "po-head" }, [
         el("span", {}, "ÉTAT DU CATALOGUE"),
-        el("span", { class: "po-v" }, "v" + (version || "—")),
+        el("span", { class: "po-v" }, "v" + (version || "")),
       ]),
       el("div", { class: "po-grid" },
         rows.map((r, i) => el("div", { class: "po-cell " + r.accentClass }, [
@@ -470,14 +470,14 @@ function renderAsideVariant(v, ctx) {
           el("div", { class: "po-lbl" }, r.lbl),
         ]))
       ),
-      el("div", { class: "po-foot" }, [el("span", { class: "sc-dot" }), document.createTextNode("MAJ " + (updated || "—"))]),
+      el("div", { class: "po-foot" }, [el("span", { class: "sc-dot" }), document.createTextNode("MAJ " + (updated || ""))]),
     ]);
   }
   if (v === "ledger") {
     return el("div", { class: "v-body ledger" }, [
       el("div", { class: "ld-head" }, [
-        el("span", {}, "RELEVÉ · " + (updated || "—")),
-        el("span", { class: "ld-no" }, "N° v" + (version || "—")),
+        el("span", {}, "RELEVÉ · " + (updated || "")),
+        el("span", { class: "ld-no" }, "N° v" + (version || "")),
       ]),
       el("div", { class: "ld-rule"}),
       el("div", { class: "ld-list" },
@@ -500,7 +500,7 @@ function renderAsideVariant(v, ctx) {
     return el("div", { class: "v-body bars" }, [
       el("div", { class: "br-head" }, [
         el("span", {}, "RÉPARTITION"),
-        el("span", { class: "br-tot" }, total + " entrées · v" + (version || "—")),
+        el("span", { class: "br-tot" }, total + " entrées · v" + (version || "")),
       ]),
       el("div", { class: "br-list" },
         rows.map((r) => el("div", { class: "br-row " + r.accentClass }, [
@@ -516,7 +516,7 @@ function renderAsideVariant(v, ctx) {
   }
   if (v === "ticker") {
     const items = (CATALOG.skills || []).slice(0, 6).map((s, i) => ({
-      time: ["00:14","00:42","01:08","02:51","04:09","07:33"][i] || "—",
+      time: ["00:14","00:42","01:08","02:51","04:09","07:33"][i] || "",
       name: s.name,
       kind: isPreset(s) ? "PRESET" : "SKILL",
       ver: s.version,
@@ -524,9 +524,9 @@ function renderAsideVariant(v, ctx) {
     return el("div", { class: "v-body ticker" }, [
       el("div", { class: "tk-head" }, [
         el("span", { class: "sc-dot" }),
-        el("span", {}, "FEED · " + (updated || "—")),
+        el("span", {}, "FEED · " + (updated || "")),
         el("span", { class: "tk-flex" }),
-        el("span", { class: "tk-v" }, "v" + (version || "—")),
+        el("span", { class: "tk-v" }, "v" + (version || "")),
       ]),
       el("div", { class: "tk-summary" },
         rows.map((r) => el("span", { class: "tk-s " + r.accentClass }, [
@@ -544,7 +544,7 @@ function renderAsideVariant(v, ctx) {
       ),
     ]);
   }
-  return el("div", {}, "—");
+  return el("div", {}, "");
 }
 
 function buildStatRibbon() { return el("div", {}, ""); }
@@ -561,7 +561,7 @@ function mountParticleSphere() {}
           el("span", { class: "dot" }),
           el("span", { class: "accent" }, "JARVIS / SKILLS"),
           el("span", { class: "sep" }, "—"),
-          el("span", {}, "MARKETPLACE PUBLIC · v" + (version || "—")),
+          el("span", {}, "MARKETPLACE PUBLIC · v" + (version || "")),
         ]),
         el("h1", {}, [
           document.createTextNode("Étends les "),
@@ -583,7 +583,7 @@ function mountParticleSphere() {}
           ]),
           el("div", { class: "hs-row" }, [
             el("span", { class: "hs-lbl" }, "MAJ"),
-            el("span", { class: "hs-val" }, updated || "—"),
+            el("span", { class: "hs-val" }, updated || ""),
           ]),
           el("div", { class: "hs-bar" }, [el("span", {})]),
           el("div", { class: "hs-foot" }, [
@@ -619,7 +619,7 @@ function buildStatRibbon2({ counts, authors, updated, version }) {
       statCell("01 · Skills", counts.skill, "modules conversationnels"),
       statCell("02 · Presets", counts.preset, "routines déclenchées"),
       statCell("03 · Auteurs", authors, "contributeurs publics"),
-      statCell("04 · MAJ", updated || "—", `v${version || "—"}`, true),
+      statCell("04 · MAJ", updated || "", `v${version || ""}`, true),
     ])
   ])]);
 }
@@ -756,7 +756,7 @@ function buildStatRibbon({ counts, authors, updated, version }) {
     statCell("01", "Skills disponibles", counts.skill, "modules conversationnels"),
     statCell("02", "Presets", counts.preset, "routines déclenchées par phrase", true),
     statCell("03", "Auteurs", authors, "contributeurs publics"),
-    statCell("04", "Total", total, `mis à jour ${updated || "—"}`),
+    statCell("04", "Total", total, `mis à jour ${updated || ""}`),
   ]);
 }
 function statCell(num, lbl, val, sub, gold) {
