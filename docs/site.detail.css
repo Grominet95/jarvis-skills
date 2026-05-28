@@ -35,6 +35,12 @@
   border-color: rgba(184,150,62,.32);
   background: var(--gold-soft);
 }
+.detail.is-view .detail-glyph {
+  color: var(--green);
+  border-color: rgba(54,211,153,.32);
+  background: var(--green-soft);
+}
+.detail.is-view .detail-eyebrow .v { color: var(--green); }
 .detail-hero-id { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .detail-eyebrow {
   font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.22em;
@@ -199,7 +205,8 @@
   letter-spacing: 0.02em; text-align: right;
 }
 .meta-val .accent { color: var(--accent); }
-.meta-val .gold { color: var(--gold); }
+.meta-val .gold   { color: var(--gold); }
+.meta-val .green  { color: var(--green); }
 
 .plats-row {
   display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;

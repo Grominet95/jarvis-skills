@@ -232,7 +232,8 @@
   border-radius: 8px;
   text-transform: uppercase;
 }
-.sk-card.is-preset .sk-glyph { color: var(--gold); border-color: rgba(184,150,62,.32); background: var(--gold-soft); }
+.sk-card.is-preset .sk-glyph { color: var(--gold);  border-color: rgba(184,150,62,.32); background: var(--gold-soft); }
+.sk-card.is-view   .sk-glyph { color: var(--green); border-color: rgba(54,211,153,.32);  background: var(--green-soft); }
 
 .sk-card-id { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .sk-card-name {
@@ -308,6 +309,8 @@
 .sk-card-go .arr { color: var(--fg-3); transition: all .15s ease; }
 .sk-card:hover .sk-card-go { color: var(--accent); }
 .sk-card:hover .sk-card-go .arr { color: var(--accent); transform: translateX(3px); }
+.sk-card.is-view:hover .sk-card-go { color: var(--green); }
+.sk-card.is-view:hover .sk-card-go .arr { color: var(--green); }
 
 /* Empty state */
 .empty {

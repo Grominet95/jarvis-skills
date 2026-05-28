@@ -33,6 +33,8 @@ function glyph(name) {
 }
 
 function isPreset(s) { return (s.type || "").toLowerCase() === "preset"; }
+function isView(s)   { return (s.type || "").toLowerCase() === "view"; }
+function skillGlyph(s) { return s.glyph || glyph(s.name); }
 
 function plats(s) {
   const all = ["mac", "windows", "linux"];
@@ -41,9 +43,9 @@ function plats(s) {
 }
 
 function installPhrase(s) {
-  return isPreset(s)
-    ? `installe le preset ${s.name}`
-    : `installe le skill ${s.name}`;
+  if (isView(s))   return `installe la vue ${s.name}`;
+  if (isPreset(s)) return `installe le preset ${s.name}`;
+  return `installe le skill ${s.name}`;
 }
 
 function utteranceForPreset(s) {
@@ -141,6 +143,7 @@ function renderAbout() {
         el("a", { href: "#/", class: "btn-ghost-lg" }, "← Accueil"),
         el("a", { href: "#/skills", class: "btn-ghost-lg" }, "Skills →"),
         el("a", { href: "#/presets", class: "btn-ghost-lg" }, "Presets →"),
+        el("a", { href: "#/views", class: "btn-ghost-lg" }, "Vues →"),
       ]),
     ]),
   ]));
@@ -148,8 +151,8 @@ function renderAbout() {
 
 function syncNavOn() {
   const route = (location.hash || "#/").replace(/^#/, "");
-  const map = { "/": "home", "/skills": "skill", "/presets": "preset", "/about": "about" };
-  let key = map[route.replace(/\/$/, "")] || (route.match(/^\/skills\//) ? "skill" : "home");
+  const map = { "/": "home", "/skills": "skill", "/presets": "preset", "/views": "view", "/about": "about" };
+  let key = map[route.replace(/\/$/, "")] || (route.match(/^\/skills\//) ? "skill" : route.match(/^\/views\//) ? "view" : "home");
   document.querySelectorAll(".nav-cat").forEach(a => {
     a.classList.toggle("is-on", a.dataset.cat === key);
   });
@@ -161,7 +164,8 @@ async function renderSection({ kind }) {
   root.appendChild(loadingNode("Catalogue Jarvis · Chargement"));
   const cat = await loadCatalog();
   const isP = kind === "preset";
-  const items = cat.skills.filter(s => isP ? isPreset(s) : !isPreset(s));
+  const isV = kind === "view";
+  const items = cat.skills.filter(s => isP ? isPreset(s) : isV ? isView(s) : (!isPreset(s) && !isView(s)));
   listState.filter = kind; listState.q = "";
 
   root.innerHTML = "";
@@ -169,24 +173,26 @@ async function renderSection({ kind }) {
   root.appendChild(el("section", { class: "sec-hero" }, [
     el("div", { class: "wrap" }, [
       el("div", { class: "sec-eyebrow" }, [
-        el("span", { class: "accent" }, isP ? "PRESETS" : "SKILLS"),
-        el("span", {}, isP ? "ROUTINES DÉCLENCHÉES PAR PHRASE" : "MODULES CONVERSATIONNELS"),
+        el("span", { class: "accent" }, isP ? "PRESETS" : isV ? "VUES" : "SKILLS"),
+        el("span", {}, isP ? "ROUTINES DÉCLENCHÉES PAR PHRASE" : isV ? "COMPOSANTS VISUELS FULL-SCREEN" : "MODULES CONVERSATIONNELS"),
         el("span", { class: "sec-flex" }),
         el("span", { class: "sec-count" }, String(items.length).padStart(2, "0") + " entrée" + (items.length>1?"s":"")),
       ]),
       el("h1", { class: "sec-h1" }, [
-        document.createTextNode(isP ? "Lance un " : "Étends Jarvis, "),
-        el("span", { class: "em" }, isP ? "mode" : "skill"),
-        document.createTextNode(isP ? " complet en une phrase." : " par skill."),
+        document.createTextNode(isP ? "Lance un " : isV ? "Installe une " : "Étends Jarvis, "),
+        el("span", { class: "em" }, isP ? "mode" : isV ? "vue" : "skill"),
+        document.createTextNode(isP ? " complet en une phrase." : isV ? " full-screen en une phrase." : " par skill."),
       ]),
       el("p", { class: "sec-lead" }, isP
         ? "Un preset orchestre une séquence d'actions sur ta machine. Lance la phrase, tout se configure."
-        : "Chaque skill est une intégration. Tu l'installes, Jarvis gagne une nouvelle capacité."
+        : isV
+          ? "Une vue est un composant visuel full-screen piloté par Jarvis. Installe-la, Jarvis pilote l'écran."
+          : "Chaque skill est une intégration. Tu l'installes, Jarvis gagne une nouvelle capacité."
       ),
       el("div", { class: "sec-search" }, [
         el("span", { class: "sec-search-ico" }, "⌕"),
         el("input", { id: "sec-search", class: "sec-search-input", type: "search",
-          placeholder: isP ? "Rechercher un preset…" : "Rechercher un skill…", autocomplete: "off" }),
+          placeholder: isP ? "Rechercher un preset…" : isV ? "Rechercher une vue…" : "Rechercher un skill…", autocomplete: "off" }),
         el("span", { class: "sec-search-kbd" }, "↵"),
       ]),
     ]),
@@ -228,10 +234,13 @@ async function renderSection({ kind }) {
 
 function renderApp() {
   const route = (location.hash || "#/").replace(/^#/, "");
-  const m = route.match(/^\/skills\/([^/]+)\/?$/);
-  if (m) return renderDetail(decodeURIComponent(m[1]));
+  const mS = route.match(/^\/skills\/([^/]+)\/?$/);
+  const mV = route.match(/^\/views\/([^/]+)\/?$/);
+  if (mS) return renderDetail(decodeURIComponent(mS[1]));
+  if (mV) return renderDetail(decodeURIComponent(mV[1]));
   if (/^\/skills\/?$/.test(route))  return renderSection({ kind: "skill" });
   if (/^\/presets\/?$/.test(route)) return renderSection({ kind: "preset" });
+  if (/^\/views\/?$/.test(route))   return renderSection({ kind: "view" });
   if (/^\/about\/?$/.test(route))   return renderAbout();
   return renderList({ filter: "all" });
 }
@@ -249,8 +258,9 @@ async function renderList(opts) {
 
   const counts = {
     all: skills.length,
-    skill: skills.filter(s => !isPreset(s)).length,
+    skill: skills.filter(s => !isPreset(s) && !isView(s)).length,
     preset: skills.filter(isPreset).length,
+    view: skills.filter(isView).length,
   };
   const authors = new Set(skills.map(s => s.author)).size;
 
@@ -300,8 +310,9 @@ function paintGrid() {
   const grid = $("#grid");
   if (!grid) return;
   const skills = CATALOG.skills.filter(s => {
-    if (listState.filter === "skill" && isPreset(s)) return false;
+    if (listState.filter === "skill" && (isPreset(s) || isView(s))) return false;
     if (listState.filter === "preset" && !isPreset(s)) return false;
+    if (listState.filter === "view" && !isView(s)) return false;
     if (listState.q) {
       const hay = (s.name + " " + s.description + " " + (s.tags || []).join(" ")).toLowerCase();
       if (!hay.includes(listState.q)) return false;
@@ -431,9 +442,10 @@ function renderAsideVariant(v, ctx) {
   const { counts, authors, updated, version } = ctx;
   const total = counts.skill + counts.preset;
   const rows = [
-    { lbl: "Skills",  sub: "modules conversationnels", val: counts.skill, accentClass: "is-accent" },
-    { lbl: "Presets", sub: "routines déclenchées",     val: counts.preset, accentClass: "is-gold" },
-    { lbl: "Auteurs", sub: "contributeurs publics",    val: authors,       accentClass: "" },
+    { lbl: "Skills",  sub: "modules conversationnels", val: counts.skill,     accentClass: "is-accent" },
+    { lbl: "Presets", sub: "routines déclenchées",     val: counts.preset,    accentClass: "is-gold" },
+    { lbl: "Vues",    sub: "composants full-screen",   val: counts.view || 0, accentClass: "is-green" },
+    { lbl: "Auteurs", sub: "contributeurs publics",    val: authors,          accentClass: "" },
   ];
 
   if (v === "editorial") {
@@ -518,7 +530,7 @@ function renderAsideVariant(v, ctx) {
     const items = (CATALOG.skills || []).slice(0, 6).map((s, i) => ({
       time: ["00:14","00:42","01:08","02:51","04:09","07:33"][i] || "",
       name: s.name,
-      kind: isPreset(s) ? "PRESET" : "SKILL",
+      kind: isPreset(s) ? "PRESET" : isView(s) ? "VUE" : "SKILL",
       ver: s.version,
     }));
     return el("div", { class: "v-body ticker" }, [
@@ -537,7 +549,7 @@ function renderAsideVariant(v, ctx) {
       el("div", { class: "tk-list" },
         items.map(it => el("div", { class: "tk-row" }, [
           el("span", { class: "tk-time" }, it.time),
-          el("span", { class: "tk-kind" + (it.kind === "PRESET" ? " is-gold" : "") }, it.kind),
+          el("span", { class: "tk-kind" + (it.kind === "PRESET" ? " is-gold" : it.kind === "VUE" ? " is-green" : "") }, it.kind),
           el("span", { class: "tk-name" }, it.name),
           el("span", { class: "tk-ver" }, "v" + it.ver),
         ]))
@@ -817,6 +829,7 @@ function buildToolbar(counts) {
         buildFilter("all", "Tous", counts.all, true),
         buildFilter("skill", "Skills", counts.skill, false),
         buildFilter("preset", "Presets", counts.preset, false),
+        buildFilter("view", "Vues", counts.view, false),
       ]),
       el("div", {}),
       el("div", { class: "search-wrap" }, [
@@ -842,7 +855,14 @@ function buildCard(s) {
   const body = [];
   body.push(el("div", { class: "sk-card-desc" }, s.description));
 
-  if (isPreset(s) && trigger) {
+  if (isView(s)) {
+    const vcmds = window.JARVIS_VIEW_COMMANDS?.[s.name] || [];
+    if (vcmds.length) {
+      body.push(el("div", { class: "sk-card-bullets" },
+        vcmds.slice(0, 3).map(c => el("div", { class: "b" }, c))
+      ));
+    }
+  } else if (isPreset(s) && trigger) {
     body.push(el("div", { class: "sk-card-trigger" }, `"${trigger}"`));
   } else if (caps.length) {
     body.push(el("div", { class: "sk-card-bullets" },
@@ -863,13 +883,13 @@ function buildCard(s) {
   }
 
   const card = el("a", {
-    class: "sk-card" + (isPreset(s) ? " is-preset" : ""),
-    href: `#/skills/${encodeURIComponent(s.name)}`,
+    class: "sk-card" + (isPreset(s) ? " is-preset" : "") + (isView(s) ? " is-view" : ""),
+    href: isView(s) ? `#/views/${encodeURIComponent(s.name)}` : `#/skills/${encodeURIComponent(s.name)}`,
     "data-name": s.name,
   }, [
-    el("div", { class: "sk-card-watermark" }, glyph(s.name)),
+    el("div", { class: "sk-card-watermark" }, skillGlyph(s)),
     el("div", { class: "sk-card-hd" }, [
-      el("div", { class: "sk-glyph" }, glyph(s.name)),
+      el("div", { class: "sk-glyph" }, skillGlyph(s)),
       el("div", { class: "sk-card-id" }, [
         el("div", { class: "sk-card-name" }, s.name),
         el("div", { class: "sk-card-meta" }, [
@@ -878,9 +898,9 @@ function buildCard(s) {
           el("span", { class: "a" }, s.author),
         ]),
       ]),
-      el("span", { class: "badge " + (isPreset(s) ? "badge--gold" : "badge--accent") }, [
+      el("span", { class: "badge " + (isPreset(s) ? "badge--gold" : isView(s) ? "badge--green" : "badge--accent") }, [
         el("span", { class: "pri-dot" }),
-        document.createTextNode(isPreset(s) ? "PRESET" : "SKILL"),
+        document.createTextNode(isPreset(s) ? "PRESET" : isView(s) ? "VUE" : "SKILL"),
       ]),
     ]),
     el("div", { class: "sk-card-body" }, body),
@@ -889,7 +909,7 @@ function buildCard(s) {
         plats(s).map(({ p, on }) => el("span", { class: "p" + (on ? " on" : "") }, p))
       ),
       el("div", { class: "sk-card-go" }, [
-        document.createTextNode(isPreset(s) ? "Voir le preset" : "Voir le skill"),
+        document.createTextNode(isPreset(s) ? "Voir le preset" : isView(s) ? "Voir la vue" : "Voir le skill"),
         el("span", { class: "arr" }, "→"),
       ]),
     ]),
@@ -956,7 +976,9 @@ async function renderDetail(name) {
 }
 
 function buildDetailShell(s) {
-  const caps = window.JARVIS_CAPABILITIES[s.name] || [];
+  const caps = isView(s)
+    ? (window.JARVIS_VIEW_COMMANDS?.[s.name] || [])
+    : (window.JARVIS_CAPABILITIES[s.name] || []);
   const reqApps = window.JARVIS_REQUIRES_APPS[s.name] || [];
   const phrase = installPhrase(s);
   const trigger = utteranceForPreset(s);
@@ -966,9 +988,9 @@ function buildDetailShell(s) {
     el("div", { class: "dcard-hd" }, [
       el("div", { class: "dcard-title" }, [
         el("span", { class: "num" }, "02"),
-        document.createTextNode(isPreset(s) ? "Ce que ce preset fait" : "Capacités"),
+        document.createTextNode(isPreset(s) ? "Ce que ce preset fait" : isView(s) ? "Commandes" : "Capacités"),
       ]),
-      el("div", { class: "dcard-sub" }, String(caps.length).padStart(2, "0") + " étapes"),
+      el("div", { class: "dcard-sub" }, String(caps.length).padStart(2, "0") + (isView(s) ? " commande" : " étape") + (caps.length > 1 ? "s" : "")),
     ]),
     el("div", { class: "cap-list" },
       caps.map((c, i) => el("div", { class: "cap-row" }, [
@@ -1072,7 +1094,12 @@ function buildDetailShell(s) {
         ]),
         el("div", { class: "dcard-sub" }, "github.com"),
       ]),
-      el("div", { style: "display:flex;flex-direction:column;gap:8px" }, [
+      el("div", { style: "display:flex;flex-direction:column;gap:8px" }, isView(s) ? [
+        sourceLink("Voir view.js", `${REPO_URL}/blob/main/${s.path}/view.js`),
+        sourceLink("Voir VIEW.md", `${REPO_URL}/blob/main/${s.path}/VIEW.md`),
+        sourceLink("Voir tool.py", `${REPO_URL}/blob/main/${s.path}/tool.py`),
+        sourceLink("Voir dans le repo", `${REPO_URL}/tree/main/${s.path}`),
+      ] : [
         sourceLink("Voir skill.yaml", `${REPO_URL}/blob/main/${s.path}/skill.yaml`),
         sourceLink("Voir skill.py", `${REPO_URL}/blob/main/${s.path}/skill.py`),
         sourceLink("Voir dans le repo", `${REPO_URL}/tree/main/${s.path}`),
@@ -1080,16 +1107,16 @@ function buildDetailShell(s) {
     ])
   ]);
 
-  return el("div", { class: "wrap detail" + (isPreset(s) ? " is-preset" : "") }, [
-    el("a", { class: "detail-back", href: "#/" }, [
+  return el("div", { class: "wrap detail" + (isPreset(s) ? " is-preset" : "") + (isView(s) ? " is-view" : "") }, [
+    el("a", { class: "detail-back", href: isView(s) ? "#/views" : "#/" }, [
       el("span", { class: "arr" }, "←"),
       document.createTextNode("Retour au catalogue"),
     ]),
     el("section", { class: "detail-hero" }, [
-      el("div", { class: "detail-glyph" }, glyph(s.name)),
+      el("div", { class: "detail-glyph" }, skillGlyph(s)),
       el("div", { class: "detail-hero-id" }, [
         el("div", { class: "detail-eyebrow" }, [
-          el("span", { class: "v" }, isPreset(s) ? "PRESET" : "SKILL"),
+          el("span", { class: "v" }, isPreset(s) ? "PRESET" : isView(s) ? "VUE" : "SKILL"),
           el("span", { class: "sep" }, "·"),
           el("span", {}, "v" + s.version),
           el("span", { class: "sep" }, "·"),
@@ -1131,7 +1158,7 @@ function buildInstallBox(phrase) {
 
 function buildMetaList(s) {
   const rows = [];
-  rows.push(["Type", isPreset(s) ? "PRESET" : "SKILL", isPreset(s) ? "gold" : "accent"]);
+  rows.push(["Type", isPreset(s) ? "PRESET" : isView(s) ? "VUE" : "SKILL", isPreset(s) ? "gold" : isView(s) ? "green" : "accent"]);
   rows.push(["Version", "v" + s.version]);
   rows.push(["Auteur", s.author]);
   if (s.tags && s.tags.length) rows.push(["Tags", null, null, s.tags]);

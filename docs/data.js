@@ -57,7 +57,25 @@ window.JARVIS_FALLBACK = {
       requires_env: [], requires_tools: ["spotify_control", "execute_cli"], requires_oauth: [],
       platforms: ["mac", "windows"],
       triggers: ["lance le mode nuit", "bonne nuit", "fin de journée", "je vais dormir", "on arrête pour ce soir"]
+    },
+    {
+      name: "globe", version: "1.0.0", type: "view", author: "BarthH95",
+      description: "Globe terrestre interactif avec navigation vocale et vols animés.",
+      tags: ["geo", "realtime", "map", "globe", "navigation"], path: "views/globe",
+      glyph: "GLB",
+      requires_env: ["MAPBOX_TOKEN"],
+      platforms: ["mac", "windows", "linux"]
     }
+  ]
+};
+
+// View commands — shown on view cards and detail pages instead of capabilities.
+window.JARVIS_VIEW_COMMANDS = {
+  "globe": [
+    "Affiche le globe en plein écran avec auto-rotation",
+    "Vol animé vers n'importe quel lieu du monde",
+    "Zoom avant / arrière avec transition fluide",
+    "Réinitialise vers la vue globe entière",
   ]
 };
 
@@ -126,5 +144,6 @@ window.JARVIS_ENV_HELP = {
   YOUTUBE_CHANNEL_ID: "Identifiant de la chaîne à analyser (UC…).",
   PRINTER_IP: "Adresse IP locale de l'imprimante BambuLab.",
   PRINTER_SERIAL: "Numéro de série imprimé sous la machine.",
-  PRINTER_ACCESS_CODE: "Code d'accès LAN (Réglages → Réseau)."
+  PRINTER_ACCESS_CODE: "Code d'accès LAN (Réglages → Réseau).",
+  MAPBOX_TOKEN: "Token public Mapbox GL JS (commence par pk.). Obtenir gratuitement sur mapbox.com."
 };
