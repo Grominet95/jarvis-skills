@@ -1,0 +1,17 @@
+name: globe-view
+label: Globe Terrestre
+version: 1.0.0
+author: BarthH95
+description: "Vue globe terrestre temps réel — navigation vocale, vols en direct, météo, navires."
+tags: [view, globe, map, geo, realtime]
+type: view
+static_files:
+  - globe.js
+  - globe.css
+requires_env: []
+requires_tools: []
+capabilities:
+  - "Afficher le globe terrestre interactif"
+  - "Naviguer vers n'importe quelle ville ou monument (\"montre Lyon\", \"va à Tokyo\")"
+  - "Voir les vols commerciaux en temps réel"
+  - "Zoom vocal, rotation, vue globale"
