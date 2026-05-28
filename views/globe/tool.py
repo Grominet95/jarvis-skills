@@ -29,24 +29,24 @@ class GlobeViewTool(Tool):
 
     async def execute(self, action: str, **kwargs) -> ToolResult:
         if action == "show":
-            self._broadcast({"type": "show_view", "view": "globe", "params": kwargs})
-            return ToolResult(success=True, data={"status": "globe shown"})
+            self._broadcast({"type": "show_view", "view_id": "globe", "params": kwargs})
+            return ToolResult(content="Globe shown.")
 
         if action == "hide":
-            self._broadcast({"type": "hide_view", "view": "globe"})
-            return ToolResult(success=True, data={"status": "globe hidden"})
+            self._broadcast({"type": "hide_view", "view_id": "globe"})
+            return ToolResult(content="Globe hidden.")
 
         supported = {"fly_to", "zoom_in", "zoom_out", "globe_view"}
         if action not in supported:
             return ToolResult(
-                success=False,
-                error=f"Unknown action '{action}'. Supported: show, hide, {', '.join(supported)}",
+                content=f"Unknown action '{action}'. Supported: show, hide, {', '.join(supported)}",
+                is_error=True,
             )
 
         self._broadcast({
             "type": "view_command",
-            "view": "globe",
+            "view_id": "globe",
             "command": action,
             "params": kwargs,
         })
-        return ToolResult(success=True, data={"action": action, "params": kwargs})
+        return ToolResult(content=f"Globe command '{action}' sent.")

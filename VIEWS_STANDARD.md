@@ -160,21 +160,21 @@ class MyViewTool(Tool):
           view_command → {"type": "view_command", "view": "mon-id", "command": "...", "params": {...}}
         """
         if action == "show":
-            self._broadcast({"type": "show_view", "view": "mon-id", "params": kwargs})
-            return ToolResult(success=True, data={"status": "shown"})
+            self._broadcast({"type": "show_view", "view_id": "mon-id", "params": kwargs})
+            return ToolResult(content="Vue shown.")
 
         if action == "hide":
-            self._broadcast({"type": "hide_view", "view": "mon-id"})
-            return ToolResult(success=True, data={"status": "hidden"})
+            self._broadcast({"type": "hide_view", "view_id": "mon-id"})
+            return ToolResult(content="Vue hidden.")
 
         # Toute autre action → view_command
         self._broadcast({
             "type": "view_command",
-            "view": "mon-id",
+            "view_id": "mon-id",
             "command": action,
             "params": kwargs,
         })
-        return ToolResult(success=True, data={"action": action, "params": kwargs})
+        return ToolResult(content=f"Command '{action}' sent.")
 ```
 
 ---

@@ -77,13 +77,13 @@ Les 3 types d'events WebSocket disponibles :
 
 ```python
 # Afficher la vue
-self._broadcast({"type": "show_view", "view": "mon-id", "params": {}})
+self._broadcast({"type": "show_view", "view_id": "mon-id", "params": {}})
 
 # Masquer la vue
-self._broadcast({"type": "hide_view", "view": "mon-id"})
+self._broadcast({"type": "hide_view", "view_id": "mon-id"})
 
 # Envoyer une commande à la vue
-self._broadcast({"type": "view_command", "view": "mon-id", "command": "mon-action", "params": {}})
+self._broadcast({"type": "view_command", "view_id": "mon-id", "command": "mon-action", "params": {}})
 ```
 
 ---

@@ -34,18 +34,18 @@ class MyViewTool(Tool):
         if action == "show":
             self._broadcast({
                 "type": "show_view",
-                "view": "ma-vue",    # TODO: Remplacer par l'id de ta vue
+                "view_id": "ma-vue",    # TODO: Remplacer par l'id de ta vue
                 "params": kwargs,
             })
-            return ToolResult(success=True, data={"status": "shown"})
+            return ToolResult(content="Vue shown.")
 
         # ── hide ──────────────────────────────────────────────────────────
         if action == "hide":
             self._broadcast({
                 "type": "hide_view",
-                "view": "ma-vue",    # TODO: Remplacer par l'id de ta vue
+                "view_id": "ma-vue",    # TODO: Remplacer par l'id de ta vue
             })
-            return ToolResult(success=True, data={"status": "hidden"})
+            return ToolResult(content="Vue hidden.")
 
         # ── Commandes custom ──────────────────────────────────────────────
         # TODO: Ajouter les actions spécifiques à ta vue.
@@ -54,15 +54,15 @@ class MyViewTool(Tool):
         # if action == "mon-action":
         #     self._broadcast({
         #         "type": "view_command",
-        #         "view": "ma-vue",
+        #         "view_id": "ma-vue",
         #         "command": action,
         #         "params": kwargs,
         #     })
-        #     return ToolResult(success=True, data={"action": action})
+        #     return ToolResult(content=f"Command '{action}' sent.")
 
         # ── Action inconnue ───────────────────────────────────────────────
         # TODO: Mettre à jour la liste des actions supportées dans le message d'erreur
         return ToolResult(
-            success=False,
-            error=f"Unknown action '{action}'. Supported: show, hide",
+            content=f"Unknown action '{action}'. Supported: show, hide",
+            is_error=True,
         )
