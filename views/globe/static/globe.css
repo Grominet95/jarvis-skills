@@ -6,6 +6,14 @@
   display: none;
   opacity: 0;
   transition: opacity 400ms ease;
+  pointer-events: none;
+}
+
+/* En mode globe : passe au-dessus de l'UI (z-index: 10 dans home.css)
+   et active les événements souris pour Mapbox */
+body.globe-mode #globe-container {
+  z-index: 15;
+  pointer-events: auto;
 }
 
 /* ── Bottom nav buttons — each independently positioned ─────────── */
@@ -627,14 +635,11 @@ body.globe-mode .panel-right {
   pointer-events: auto;
 }
 
-/* Home (home.html) */
-body.globe-mode .home-shell {
-  pointer-events: none;
-}
-
+/* Home (home.html) — les contrôles restent cliquables au-dessus du globe */
 body.globe-mode .home-controls,
 body.globe-mode .hc-widget,
 body.globe-mode .cam-overlay {
+  z-index: 20;
   pointer-events: auto;
 }
 
