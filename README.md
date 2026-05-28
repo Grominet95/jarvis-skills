@@ -54,6 +54,18 @@ Dans Jarvis, ouvre **Paramètres › Marketplace**, recherche le skill et clique
 | [mode-travail](skills/mode-travail/) | Ouvre Notion, VS Code et active le mode focus | mac, windows |
 | [mode-nuit](skills/mode-nuit/) | Ferme les apps de travail, lance une playlist et fait le bilan de journée | mac, windows |
 
+### Vues
+
+Une vue est un composant visuel **full-screen** piloté par le backend via WebSocket.
+Elle s'enregistre via `Jarvis.views.register()` et répond aux events `show_view`, `hide_view`, `view_command`.
+
+| Vue | Description | Variables d'env |
+|-----|-------------|-----------------|
+| [globe](views/globe/) | Globe terrestre interactif avec navigation vocale | `MAPBOX_TOKEN` |
+
+Lire [VIEWS_STANDARD.md](VIEWS_STANDARD.md) pour créer sa propre vue.
+Le dossier [views/TEMPLATE/](views/TEMPLATE/) contient un template vide commenté.
+
 ---
 
 ## Contribuer
