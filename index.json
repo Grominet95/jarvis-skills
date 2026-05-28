@@ -1,6 +1,6 @@
 {
-  "version": "1.3",
-  "updated_at": "2026-05-11",
+  "version": "1.4",
+  "updated_at": "2026-05-28",
   "skills": [
     {
       "name": "web-researcher",
@@ -147,6 +147,27 @@
       ],
       "triggers": ["lance le mode nuit", "bonne nuit", "fin de journée", "je vais dormir", "on arrête pour ce soir"],
       "platforms": ["mac", "windows"]
+    },
+    {
+      "name": "globe",
+      "version": "1.0.0",
+      "type": "view",
+      "author": "BarthH95",
+      "description": "Globe terrestre interactif avec navigation vocale et vols animés.",
+      "tags": ["geo", "realtime", "map", "globe", "navigation"],
+      "path": "views/globe",
+      "glyph": "GLB",
+      "requires_env": ["MAPBOX_TOKEN"],
+      "requires_tools": [],
+      "requires_oauth": [],
+      "requires_apps": [],
+      "capabilities": [
+        "Affiche le globe en plein écran avec auto-rotation",
+        "Vol animé vers n'importe quel lieu du monde",
+        "Zoom avant / arrière avec transition fluide",
+        "Réinitialise vers la vue globe entière"
+      ],
+      "platforms": ["mac", "windows", "linux"]
     }
   ]
 }
