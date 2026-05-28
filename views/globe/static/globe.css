@@ -643,6 +643,12 @@ body.globe-mode .cam-overlay {
   pointer-events: auto;
 }
 
+/* L'orbe canvas est dans home-shell (z-index 20) — sans cette règle il
+   intercepte tous les clics et bloque la navigation Mapbox */
+body.globe-mode #orb-canvas {
+  pointer-events: none;
+}
+
 /* ── Legacy floating legend (unused in globe-mode) ─────────────── */
 #globe-legend {
   display: none;
