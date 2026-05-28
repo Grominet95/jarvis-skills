@@ -616,12 +616,25 @@ body.intel-mode #settings-nav-btn {
 }
 
 /* ── Globe mode : laisser passer les clics vers Mapbox ──────────── */
+
+/* Dashboard (index.html) */
 body.globe-mode .layout {
   pointer-events: none;
 }
 
 body.globe-mode .panel-left,
 body.globe-mode .panel-right {
+  pointer-events: auto;
+}
+
+/* Home (home.html) */
+body.globe-mode .home-shell {
+  pointer-events: none;
+}
+
+body.globe-mode .home-controls,
+body.globe-mode .hc-widget,
+body.globe-mode .cam-overlay {
   pointer-events: auto;
 }
 
