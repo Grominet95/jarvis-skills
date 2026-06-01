@@ -481,7 +481,10 @@ class _Visitor(ast.NodeVisitor):
 
 def scan_file(py_path: Path, root: Path) -> ScanResult:
     """Analyse un fichier .py par AST et retourne les findings."""
-    rel = str(py_path.relative_to(root))
+    try:
+        rel = str(py_path.relative_to(root))
+    except ValueError:
+        rel = str(py_path)
     try:
         src = py_path.read_text(encoding="utf-8")
     except Exception as exc:
