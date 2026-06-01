@@ -1,17 +1,93 @@
 {
-  "version": "1.4",
-  "updated_at": "2026-05-28",
+  "version": "2.0",
+  "updated_at": "2026-06-01",
   "skills": [
+    {
+      "name": "bambulab-printer",
+      "version": "1.1.0",
+      "type": "conversational",
+      "author": "BarthH95",
+      "description": "Contrôle une imprimante 3D BambuLab via MQTT.",
+      "tags": [
+        "hardware",
+        "3d-print",
+        "bambu"
+      ],
+      "path": "skills/bambulab-printer",
+      "requires_env": [
+        "PRINTER_IP",
+        "PRINTER_SERIAL",
+        "PRINTER_ACCESS_CODE"
+      ],
+      "requires_tools": [],
+      "requires_oauth": [],
+      "requires_apps": [
+        "Bambu Studio",
+        "OrcaSlicer"
+      ],
+      "capabilities": [
+        "Vérifie l'état de l'imprimante (idle, impression en cours, erreur)",
+        "Lance une impression depuis un fichier G-code existant",
+        "Suit la progression d'une impression (pourcentage, temps restant)",
+        "Annule une impression en cours",
+        "Slice un fichier STL avec OrcaSlicer avant impression"
+      ],
+      "platforms": [
+        "mac",
+        "windows",
+        "linux"
+      ]
+    },
+    {
+      "name": "fusion360",
+      "version": "1.1.0",
+      "type": "conversational",
+      "author": "BarthH95",
+      "description": "Contrôle Autodesk Fusion 360 via MCP : modélisation 3D, scripts, export STL.",
+      "tags": [
+        "hardware",
+        "cad",
+        "3d",
+        "fusion",
+        "design"
+      ],
+      "path": "skills/fusion360",
+      "requires_env": [],
+      "requires_tools": [],
+      "requires_oauth": [],
+      "requires_apps": [
+        "Autodesk Fusion 360",
+        "Add-in FusionMCP"
+      ],
+      "capabilities": [
+        "Crée des géométries 3D via scripts Python Fusion API (boîtes, cylindres, formes complexes)",
+        "Modifie des designs existants (congés, chanfreins, coupes)",
+        "Lit les dimensions et propriétés du document actif",
+        "Exporte des corps en STL pour impression 3D",
+        "Annule et refait les dernières actions",
+        "Capture une screenshot de la vue actuelle"
+      ],
+      "platforms": [
+        "mac",
+        "windows"
+      ]
+    },
     {
       "name": "web-researcher",
       "version": "1.1.0",
       "type": "conversational",
       "author": "BarthH95",
       "description": "Recherche web avancée avec synthèse structurée et citations sources.",
-      "tags": ["research", "web", "search"],
+      "tags": [
+        "research",
+        "web",
+        "search"
+      ],
       "path": "skills/web-researcher",
       "requires_env": [],
-      "requires_tools": ["browser"],
+      "requires_tools": [
+        "browser"
+      ],
       "requires_oauth": [],
       "requires_apps": [],
       "capabilities": [
@@ -20,7 +96,11 @@
         "Cite systématiquement les sources avec leurs URLs",
         "Indique la fraîcheur des informations trouvées"
       ],
-      "platforms": ["mac", "windows", "linux"]
+      "platforms": [
+        "mac",
+        "windows",
+        "linux"
+      ]
     },
     {
       "name": "youtube-analyzer",
@@ -28,9 +108,17 @@
       "type": "conversational",
       "author": "BarthH95",
       "description": "Analyse les performances YouTube et suggère des améliorations.",
-      "tags": ["youtube", "analytics", "content", "creator"],
+      "tags": [
+        "youtube",
+        "analytics",
+        "content",
+        "creator"
+      ],
       "path": "skills/youtube-analyzer",
-      "requires_env": ["YOUTUBE_API_KEY", "YOUTUBE_CHANNEL_ID"],
+      "requires_env": [
+        "YOUTUBE_API_KEY",
+        "YOUTUBE_CHANNEL_ID"
+      ],
       "requires_tools": [],
       "requires_oauth": [],
       "requires_apps": [],
@@ -40,49 +128,53 @@
         "Compare les vidéos entre elles pour identifier les formats qui marchent",
         "Suggère des sujets basés sur les tendances de la chaîne"
       ],
-      "platforms": ["mac", "windows", "linux"]
-    },
+      "platforms": [
+        "mac",
+        "windows",
+        "linux"
+      ]
+    }
+  ],
+  "presets": [
     {
-      "name": "bambulab-printer",
+      "name": "mode-nuit",
       "version": "1.1.0",
-      "type": "conversational",
+      "type": "preset",
       "author": "BarthH95",
-      "description": "Contrôle une imprimante 3D BambuLab via MQTT.",
-      "tags": ["hardware", "3d-print", "bambu"],
-      "path": "skills/bambulab-printer",
-      "requires_env": ["PRINTER_IP", "PRINTER_SERIAL", "PRINTER_ACCESS_CODE"],
-      "requires_tools": [],
-      "requires_oauth": [],
-      "requires_apps": ["Bambu Studio", "OrcaSlicer"],
-      "capabilities": [
-        "Vérifie l'état de l'imprimante",
-        "Lance et suit une impression",
-        "Annule une impression en cours",
-        "Slice un fichier STL avec OrcaSlicer"
+      "description": "Prépare la fin de journée : ferme les apps de travail, musique douce.",
+      "tags": [
+        "preset",
+        "nuit",
+        "veille",
+        "fin-de-journee"
       ],
-      "platforms": ["mac", "windows", "linux"]
-    },
-    {
-      "name": "fusion360",
-      "version": "1.1.0",
-      "type": "conversational",
-      "author": "BarthH95",
-      "description": "Contrôle Autodesk Fusion 360 via MCP : modélisation 3D, scripts, export STL.",
-      "tags": ["hardware", "cad", "3d", "fusion", "design"],
-      "path": "skills/fusion360",
+      "path": "skills/mode-nuit",
       "requires_env": [],
-      "requires_tools": [],
-      "requires_oauth": [],
-      "requires_apps": ["Autodesk Fusion 360", "Add-in FusionMCP"],
-      "capabilities": [
-        "Crée des géométries 3D via scripts Python Fusion API",
-        "Modifie des designs existants (congés, chanfreins, coupes)",
-        "Lit les dimensions et propriétés du document actif",
-        "Exporte des corps en STL pour impression 3D",
-        "Annule et refait les dernières actions",
-        "Capture une screenshot de la vue actuelle"
+      "requires_tools": [
+        "spotify_control",
+        "execute_cli"
       ],
-      "platforms": ["mac", "windows"]
+      "requires_oauth": [],
+      "requires_apps": [
+        "Visual Studio Code"
+      ],
+      "capabilities": [
+        "Ferme VS Code et Notion proprement",
+        "Lance une playlist Spotify pour se détendre",
+        "Désactive le mode Ne pas déranger",
+        "Fait un bilan motivant de la journée"
+      ],
+      "platforms": [
+        "mac",
+        "windows"
+      ],
+      "triggers": [
+        "lance le mode nuit",
+        "bonne nuit",
+        "fin de journée",
+        "je vais dormir",
+        "on arrête pour ce soir"
+      ]
     },
     {
       "name": "mode-streameur",
@@ -90,72 +182,101 @@
       "type": "preset",
       "author": "BarthH95",
       "description": "Lance l'environnement stream : OBS, Ne pas déranger, Twitch, recommandation de jeu.",
-      "tags": ["preset", "stream", "gaming", "obs", "twitch"],
+      "tags": [
+        "preset",
+        "stream",
+        "gaming",
+        "obs",
+        "twitch"
+      ],
       "path": "skills/mode-streameur",
       "requires_env": [],
-      "requires_tools": ["execute_cli"],
+      "requires_tools": [
+        "execute_cli"
+      ],
       "requires_oauth": [],
-      "requires_apps": ["OBS Studio"],
+      "requires_apps": [
+        "OBS Studio"
+      ],
       "capabilities": [
         "Ouvre OBS Studio automatiquement",
         "Ouvre le dashboard Twitch dans le navigateur",
-        "Active le mode Ne pas déranger",
+        "Active le mode Ne pas déranger sur macOS et Windows",
         "Recommande un jeu à streamer et ouvre sa page Steam",
         "Souhaite bonne session avec message vocal"
       ],
-      "triggers": ["lance le mode streameur", "démarre le stream", "on stream", "je vais streamer"],
-      "platforms": ["mac", "windows"]
+      "platforms": [
+        "mac",
+        "windows"
+      ],
+      "triggers": [
+        "lance le mode streameur",
+        "démarre le stream",
+        "on stream",
+        "je vais streamer"
+      ]
     },
     {
       "name": "mode-travail",
       "version": "1.1.0",
       "type": "preset",
       "author": "BarthH95",
-      "description": "Lance l'environnement de travail : Notion, VS Code, musique focus.",
-      "tags": ["preset", "travail", "focus", "productivite"],
+      "description": "Lance l'environnement de travail : apps, musique focus, Ne pas déranger.",
+      "tags": [
+        "preset",
+        "travail",
+        "focus",
+        "productivite"
+      ],
       "path": "skills/mode-travail",
       "requires_env": [],
-      "requires_tools": ["spotify_control", "execute_cli", "notion_tasks"],
+      "requires_tools": [
+        "spotify_control",
+        "execute_cli",
+        "notion_tasks"
+      ],
       "requires_oauth": [],
-      "requires_apps": ["Notion", "Visual Studio Code"],
+      "requires_apps": [
+        "Notion",
+        "Visual Studio Code"
+      ],
       "capabilities": [
         "Ouvre Notion et VS Code",
         "Lance une playlist Spotify deep focus",
         "Active le mode Ne pas déranger",
         "Fait un brief vocal des tâches Notion du jour"
       ],
-      "triggers": ["lance le mode travail", "mode focus", "on bosse", "je commence à travailler"],
-      "platforms": ["mac", "windows"]
-    },
-    {
-      "name": "mode-nuit",
-      "version": "1.1.0",
-      "type": "preset",
-      "author": "BarthH95",
-      "description": "Prépare la fin de journée : ferme les apps de travail, musique douce, bilan.",
-      "tags": ["preset", "nuit", "veille", "fin-de-journee"],
-      "path": "skills/mode-nuit",
-      "requires_env": [],
-      "requires_tools": ["spotify_control", "execute_cli"],
-      "requires_oauth": [],
-      "requires_apps": ["Visual Studio Code"],
-      "capabilities": [
-        "Ferme VS Code et Notion proprement",
-        "Lance une playlist Spotify pour se détendre",
-        "Désactive le mode Ne pas déranger",
-        "Fait un bilan motivant de la journée"
+      "platforms": [
+        "mac",
+        "windows"
       ],
-      "triggers": ["lance le mode nuit", "bonne nuit", "fin de journée", "je vais dormir", "on arrête pour ce soir"],
-      "platforms": ["mac", "windows"]
-    },
+      "triggers": [
+        "lance le mode travail",
+        "mode focus",
+        "on bosse",
+        "je commence à travailler",
+        "démarre la session de travail"
+      ]
+    }
+  ],
+  "views": [
     {
       "name": "globe-view",
       "version": "1.0.0",
       "author": "BarthH95",
       "description": "Vue globe terrestre temps réel — navigation vocale, vols en direct, météo, navires.",
-      "tags": ["view", "globe", "map", "geo", "realtime"],
+      "tags": [
+        "view",
+        "globe",
+        "map",
+        "geo",
+        "realtime"
+      ],
       "path": "views/globe",
-      "static_files": ["globe.js", "globe.css"],
+      "static_files": [
+        "globe.js",
+        "globe.css"
+      ],
       "requires_tools": [],
       "requires_env": []
     }
