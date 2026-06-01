@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grominet95.github.io/jarvis-skills/schemas/skill.schema.json",
+  "title": "Jarvis Skill conversationnel",
+  "description": "Schéma de validation d'un skill.yaml de type conversational",
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "author",
+    "description",
+    "tags",
+    "type",
+    "platforms",
+    "requires_env",
+    "requires_tools",
+    "requires_oauth",
+    "requires_apps",
+    "capabilities"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Identifiant unique kebab-case (lettres minuscules, chiffres, tirets)"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "description": "Version sémantique MAJOR.MINOR.PATCH"
+    },
+    "author": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Pseudo GitHub de l'auteur"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Description en une phrase claire"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Mots-clés pour le filtre du marketplace"
+    },
+    "type": {
+      "const": "conversational",
+      "description": "Type du skill — doit être exactement \"conversational\""
+    },
+    "jarvis_min_version": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Version minimale de Jarvis requise (ex: 3.0)"
+    },
+    "triggers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Phrases déclencheuses — toujours vide [] pour les skills conversationnels"
+    },
+    "platforms": {
+      "type": "array",
+      "items": { "enum": ["mac", "windows", "linux"] },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Plateformes supportées"
+    },
+    "requires_env": {
+      "type": "array",
+      "description": "Variables d'environnement requises",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nom de la variable (forme courte)"
+          },
+          {
+            "type": "object",
+            "required": ["name", "description"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Nom de la variable d'environnement (ex: YOUTUBE_API_KEY)"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Explication et contexte"
+              },
+              "example": {
+                "type": "string",
+                "description": "Valeur d'exemple"
+              },
+              "sensitive": {
+                "type": "boolean",
+                "description": "true si la valeur est un secret (API key, token, mot de passe)"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "requires_tools": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Outils Jarvis requis (ex: browser, execute_cli)"
+    },
+    "requires_oauth": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Connexions OAuth requises (ex: google, spotify)"
+    },
+    "requires_apps": {
+      "type": "array",
+      "description": "Applications tierces requises",
+      "items": {
+        "type": "object",
+        "required": ["name", "description", "url", "required"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nom affiché de l'application"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Pourquoi cette application est nécessaire"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL de téléchargement"
+          },
+          "mac_bundle": {
+            "type": "string",
+            "description": "Nom dans /Applications/ (ex: \"Visual Studio Code\")"
+          },
+          "windows_exe": {
+            "type": "string",
+            "description": "Nom du processus Windows (ex: \"code.exe\")"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "true = bloquant (skill non fonctionnel sans), false = optionnel"
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "maxItems": 6,
+      "description": "Liste de ce que le skill peut faire — max 6, chaque item commence par un verbe à la 3e personne"
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grominet95.github.io/jarvis-skills/schemas/view.schema.json",
+  "title": "Jarvis View — front-matter VIEW.md",
+  "description": "Schéma de validation du front-matter YAML d'un fichier VIEW.md",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "version",
+    "author",
+    "description",
+    "glyph"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Identifiant unique kebab-case — doit correspondre exactement à l'id dans Jarvis.views.register()"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Nom affiché dans le marketplace"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "description": "Version sémantique MAJOR.MINOR.PATCH"
+    },
+    "author": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Pseudo GitHub de l'auteur"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Description en une phrase claire"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Mots-clés pour le filtre du marketplace"
+    },
+    "glyph": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{2,4}$",
+      "description": "2-4 lettres/chiffres majuscules affichés dans le badge de la carte (ex: GLB, MAP, CAM)"
+    },
+    "requires_env": {
+      "type": "array",
+      "description": "Variables d'environnement requises",
+      "items": {
+        "type": "object",
+        "required": ["name", "description"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nom de la variable d'environnement (ex: MAPBOX_TOKEN)"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Explication et contexte"
+          },
+          "example": {
+            "type": "string",
+            "description": "Valeur d'exemple (tronquée si sensible)"
+          },
+          "sensitive": {
+            "type": "boolean",
+            "description": "true si la valeur est un secret (token, clé API)"
+          }
+        }
+      }
+    },
+    "commands": {
+      "type": "array",
+      "description": "Commandes supportées par la méthode command() de la vue",
+      "items": {
+        "type": "object",
+        "required": ["action", "description"],
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nom de l'action (ex: fly_to, zoom_in)"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Ce que fait la commande"
+          },
+          "params": {
+            "type": "object",
+            "description": "Paramètres acceptés — clés = noms, valeurs = types sous forme de chaîne (ex: { location: string, zoom: int })",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
