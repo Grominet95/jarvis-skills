@@ -1,0 +1,48 @@
+name: Validation des skills Jarvis
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  validate:
+    name: Valider manifestes + index
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configuration Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installation des dépendances
+        run: pip install jsonschema pyyaml
+
+      # ── Étape 1 : validation structurelle des manifestes ──────────────────
+      # Dépend de schemas/*.schema.json (agent docs/machine-standards).
+      # Si les schémas sont absents, la validation structurelle est ignorée
+      # avec avertissement ; les autres vérifications (kebab-case, semver,
+      # AST, secrets) restent actives.
+      - name: Validation des manifestes (validate_skills.py)
+        run: python scripts/validate_skills.py
+
+      # ── Étape 2 : cohérence index.json ────────────────────────────────────
+      # Échoue si index.json n'a pas été régénéré après modification d'un
+      # manifeste. Lancer `python scripts/generate_index.py` en local pour le mettre à jour.
+      - name: Cohérence index.json (generate_index.py --check)
+        run: python scripts/generate_index.py --check
+
+      # ── Étape 3 : analyse de sécurité ─────────────────────────────────────
+      # Dépend de scripts/scan_security.py (agent feat/security-scan).
+      # Ignoré avec message explicite si le fichier est absent.
+      - name: Analyse de sécurité (scan_security.py)
+        run: |
+          if [ -f scripts/scan_security.py ]; then
+            python scripts/scan_security.py
+          else
+            echo "⚠ scripts/scan_security.py non disponible (dépendance feat/security-scan — ignoré)"
+          fi
