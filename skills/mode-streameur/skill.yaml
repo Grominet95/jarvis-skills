@@ -1,7 +1,7 @@
 name: mode-streameur
 version: 2.0.0
 author: BarthH95
-description: Lance l'environnement stream : OBS, Ne pas déranger, Twitch, recommandation de jeu.
+description: "Lance l'environnement stream : OBS, Ne pas déranger, Twitch, recommandation de jeu."
 tags: [preset, stream, gaming, obs, twitch]
 type: preset
 triggers:
