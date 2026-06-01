@@ -3,6 +3,8 @@
 Ce document est la **référence unique** pour créer une vue installable dans Jarvis.
 Une vue est un composant visuel full-screen piloté par le backend via WebSocket.
 
+Schéma machine-vérifiable : [`schemas/view.schema.json`](schemas/view.schema.json)
+
 ---
 
 ## Structure d'une vue
@@ -207,6 +209,9 @@ execute(action="fly_to")  ──►  view_command     ──►  command("fly_to
 
 ## Voir aussi
 
+- [Schéma JSON : schemas/view.schema.json](schemas/view.schema.json)
 - [Vue de référence : Globe](views/globe/)
 - [Template vide à copier](views/TEMPLATE/)
+- [Standard skills : SKILLS_STANDARD.md](SKILLS_STANDARD.md)
+- [Standard presets : PRESETS_STANDARD.md](PRESETS_STANDARD.md)
 - [CONTRIBUTING.md](CONTRIBUTING.md)
