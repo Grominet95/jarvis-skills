@@ -1,4 +1,4 @@
-"""Tool backend pour la vue Astronomy."""
+"""Tool backend pour la vue Carte du ciel (id: astronomy)."""
 from __future__ import annotations
 from typing import Callable
 from tools.base import Tool, ToolResult
@@ -7,20 +7,20 @@ from tools.base import Tool, ToolResult
 class AstronomyViewTool(Tool):
     name = "astronomy_view"
     description = """
-    Affiche et contrôle la vue système solaire interactive.
+    Affiche et contrôle la carte du ciel (constellations) en plein écran.
 
     Utiliser quand l'utilisateur veut :
-    - Voir le système solaire ("montre le système solaire", "affiche l'espace")
-    - Visualiser une planète ("montre Mars", "affiche Jupiter", "à quoi ressemble Saturne ?")
-    - Avoir des infos sur une planète ou un objet céleste ("parle-moi de Neptune", "c'est quoi la taille de la Terre ?")
-    - Explorer l'astronomie, les planètes, les orbites, l'espace
+    - Voir le ciel / les étoiles ("affiche-moi le ciel", "montre les étoiles")
+    - Visualiser une constellation ("montre Orion", "où est la Grande Ourse ?")
+    - Explorer les constellations, les astres, la voûte céleste
 
     Actions disponibles :
-    - show           : affiche la vue système solaire
-    - hide           : masque la vue
-    - solar_system   : vue d'ensemble du système solaire
-    - focus_planet   : zoom sur une planète (params: planet — ex: "Mars", "Jupiter", "Terre")
-    - fly_to_object  : navigation animée vers un objet (params: object_name)
+    - show                : affiche la carte du ciel (vue d'ensemble)
+    - hide                : masque la vue
+    - overview            : revient à la vue d'ensemble (retire le focus)
+    - focus_constellation : met une constellation au point
+                            (params: constellation — "Orion", "Cassiopée",
+                             "Grande Ourse", "Cygne")
     """
 
     def __init__(self, broadcast_event: Callable[[dict], None]) -> None:
@@ -29,13 +29,13 @@ class AstronomyViewTool(Tool):
     async def execute(self, action: str, **kwargs) -> ToolResult:
         if action == "show":
             self._broadcast({"type": "show_view", "view_id": "astronomy", "params": kwargs})
-            return ToolResult(content="Vue Astronomy affichée.")
+            return ToolResult(content="Carte du ciel affichée.")
 
         if action == "hide":
             self._broadcast({"type": "hide_view", "view_id": "astronomy"})
-            return ToolResult(content="Vue Astronomy masquée.")
+            return ToolResult(content="Carte du ciel masquée.")
 
-        supported = {"solar_system", "focus_planet", "fly_to_object"}
+        supported = {"overview", "focus_constellation"}
         if action not in supported:
             return ToolResult(
                 content=f"Action inconnue '{action}'. Supportées : show, hide, {', '.join(supported)}",
@@ -48,4 +48,4 @@ class AstronomyViewTool(Tool):
             "command": action,
             "params": kwargs,
         })
-        return ToolResult(content=f"Commande '{action}' envoyée à la vue Astronomy.")
+        return ToolResult(content=f"Commande '{action}' envoyée à la carte du ciel.")

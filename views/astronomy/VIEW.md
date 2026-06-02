@@ -1,24 +1,36 @@
 ---
 id: astronomy
-name: Astronomy
-version: 1.0.0
+name: Carte du ciel
+version: 2.0.0
 author: Grominet95
-description: "Système solaire interactif 3D — visualise planètes, orbites et faits astronomiques"
-tags: [astronomie, espace, planètes, 3D]
-glyph: AST
+description: "Voûte céleste immersive — constellations qui s'illuminent au focus, faits stellaires"
+tags: [astronomie, ciel, constellations, étoiles]
+glyph: SKY
 commands:
   - action: show
-    description: Affiche le système solaire en plein écran
+    description: Affiche la carte du ciel en plein écran (vue d'ensemble, constellations tracées faiblement)
   - action: hide
-    description: Masque la vue astronomie
-  - action: solar_system
-    description: Vue d'ensemble du système solaire avec toutes les planètes en orbite
-  - action: focus_planet
-    description: Zoom et centre sur une planète avec panneau d'informations
+    description: Masque la vue
+  - action: overview
+    description: Revient à la vue d'ensemble du ciel (dézoom, retire le focus)
+  - action: focus_constellation
+    description: Met une constellation au point — le reste du ciel s'assombrit, ses lignes s'illuminent, son nom s'écrit en grand
     params:
-      planet: string
-  - action: fly_to_object
-    description: Navigation animée vers un objet céleste nommé
-    params:
-      object_name: string
+      constellation: string   # "Orion", "Cassiopée", "Grande Ourse", "Cygne"
 ---
+
+# Carte du ciel — vue Jarvis
+
+Parti pris **Focus** (validé) : au repos les constellations sont tracées
+faiblement sur une voûte d'étoiles ; sur commande ou survol, **une**
+constellation s'illumine, le reste du ciel s'assombrit (voile léger), et son
+nom s'inscrit en grand (serif géant) avec ses statistiques.
+
+- `show` ouvre en **vue d'ensemble**. `show` avec `constellation` ouvre
+  directement sur le focus correspondant.
+- 4 constellations embarquées (zéro réseau) : Orion, Cassiopée, Grande Ourse,
+  Cygne. Étendre = ajouter une entrée dans la table `CONST` de `view.js`.
+- Clic sur une constellation → focus ; clic ailleurs / `esc` → vue d'ensemble.
+
+Remplace l'ancienne vue « système solaire » tout en conservant l'**id
+`astronomy`** (les références backend restent valides).

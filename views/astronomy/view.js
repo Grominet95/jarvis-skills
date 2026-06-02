@@ -1,608 +1,455 @@
 /**
  * Vue Astronomy — jarvis-skills
- * Système solaire interactif Canvas 2D — données statiques embarquées, zéro réseau.
+ * Carte du ciel / Constellations — voûte céleste Canvas 2D, données embarquées,
+ * zéro réseau. Parti pris « Focus » : au repos les constellations sont tracées
+ * faiblement ; au survol/commande, UNE constellation s'illumine, le reste du
+ * ciel s'assombrit, son nom s'écrit en grand.
+ *
+ * Dépend de : _shared.js (Jarvis.views doit être chargé avant ce fichier).
+ * Le chrome (marque, eyebrow, voix, légende, panneau) est le langage commun
+ * aux 4 vues Jarvis — injecté via un <style> partagé idempotent (#jx-chrome-css).
  */
 (function () {
   if (!window.Jarvis?.views) return;
 
   const VIEW_ID = 'astronomy';
+  const STYLE_ID = 'astronomy-css';
 
-  // ── Données statiques ────────────────────────────────────────────────────────
+  /* ─────────────────────────────────────────────────────────────────────
+     CHROME PARTAGÉ — identique sur les 4 vues Jarvis.
+     Bloc CSS + petit constructeur DOM. Injecté une seule fois (guard).
+     ───────────────────────────────────────────────────────────────────── */
+  const JX_CHROME_CSS_ID = 'jx-chrome-css';
+  const JX_CHROME_CSS = `
+    .jx-chrome { position:absolute; inset:0; z-index:6; pointer-events:none; font-family:var(--sans,"Geist",system-ui,sans-serif); }
+    .jx-chrome > * { pointer-events:auto; }
+    .jx-brand { position:absolute; top:28px; left:32px; display:flex; align-items:center; gap:12px; }
+    .jx-brand svg { display:block; flex-shrink:0; }
+    .jx-brand-txt { display:flex; flex-direction:column; gap:4px; line-height:1; }
+    .jx-brand-word { font-family:var(--display-mark,"Landasans",var(--serif,"Geist")); font-weight:500; font-size:14px; letter-spacing:.22em; color:var(--fg-0,#DCE8FF); }
+    .jx-brand-status { font-family:var(--mono,"Geist Mono",monospace); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.4)); display:flex; align-items:center; gap:6px; }
+    .jx-brand-status::before { content:""; width:4px; height:4px; border-radius:50%; background:var(--green,#36D399); box-shadow:0 0 5px var(--green,#36D399); }
+    .jx-eyebrow { position:absolute; top:30px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:10px; font-family:var(--mono,monospace); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--fg-2,rgba(220,232,255,.58)); white-space:nowrap; }
+    .jx-eyebrow .vn { color:var(--accent,#4A9EFF); }
+    .jx-eyebrow .sep { color:var(--fg-4,rgba(220,232,255,.22)); }
+    .jx-context { position:absolute; top:28px; right:32px; display:flex; align-items:center; gap:14px; font-family:var(--mono,monospace); font-size:10.5px; letter-spacing:.06em; color:var(--fg-2,rgba(220,232,255,.58)); font-variant-numeric:tabular-nums; }
+    .jx-context .sep { width:1px; height:11px; background:var(--line-2,rgba(220,232,255,.1)); }
+    .jx-context .muted { color:var(--fg-3,rgba(220,232,255,.4)); letter-spacing:.12em; text-transform:uppercase; font-size:9.5px; }
+    .jx-voice { position:absolute; bottom:26px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:10px; padding:7px 14px 7px 12px; border-radius:999px; background:rgba(6,8,13,.62); border:1px solid var(--line-2,rgba(220,232,255,.1)); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); }
+    .jx-voice .vbars { display:flex; align-items:center; gap:2px; height:14px; }
+    .jx-voice .vbars i { width:2px; border-radius:1px; background:var(--accent,#4A9EFF); box-shadow:0 0 5px var(--accent,#4A9EFF); animation:jx-vbar 1s ease-in-out infinite; }
+    .jx-voice .vbars i:nth-child(1){ height:5px; animation-delay:0s; }
+    .jx-voice .vbars i:nth-child(2){ height:11px; animation-delay:.12s; }
+    .jx-voice .vbars i:nth-child(3){ height:7px; animation-delay:.24s; }
+    .jx-voice .vbars i:nth-child(4){ height:13px; animation-delay:.36s; }
+    .jx-voice .vbars i:nth-child(5){ height:6px; animation-delay:.48s; }
+    @keyframes jx-vbar { 0%,100%{ transform:scaleY(.5); opacity:.6; } 50%{ transform:scaleY(1); opacity:1; } }
+    .jx-voice .vtxt { font-family:var(--mono,monospace); font-size:10px; letter-spacing:.08em; color:var(--fg-1,rgba(220,232,255,.78)); }
+    .jx-voice .vtxt b { color:var(--fg-0,#DCE8FF); font-weight:500; }
+    .jx-navhint { position:absolute; bottom:28px; right:32px; display:flex; align-items:center; gap:14px; font-family:var(--mono,monospace); font-size:9.5px; letter-spacing:.08em; color:var(--fg-3,rgba(220,232,255,.4)); }
+    .jx-navhint b { color:var(--fg-1,rgba(220,232,255,.78)); font-weight:400; }
+    .jx-navhint .k { border:1px solid var(--line-2,rgba(220,232,255,.1)); border-radius:3px; padding:1px 5px; color:var(--fg-2,rgba(220,232,255,.58)); }
+    .jx-legend { position:absolute; bottom:28px; left:32px; display:flex; flex-direction:column; gap:6px; font-family:var(--mono,monospace); font-size:9.5px; letter-spacing:.06em; color:var(--fg-3,rgba(220,232,255,.4)); }
+    .jx-legend .lg-row { display:flex; align-items:center; gap:8px; }
+    .jx-legend .lg-sw { width:10px; height:2px; border-radius:2px; }
+    .jx-panel { position:absolute; background:rgba(10,14,22,.78); border:1px solid var(--line-2,rgba(220,232,255,.1)); border-radius:var(--r-4,16px); backdrop-filter:blur(20px) saturate(150%); -webkit-backdrop-filter:blur(20px) saturate(150%); padding:20px; box-shadow:0 24px 60px -24px rgba(0,0,0,.7); width:312px; }
+    .jx-panel-eyebrow { font-family:var(--mono,monospace); font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.4)); display:flex; align-items:center; justify-content:space-between; }
+    .jx-panel-title { font-family:var(--serif,"Geist"); font-weight:300; font-size:26px; letter-spacing:-.03em; color:var(--fg-0,#DCE8FF); line-height:1.05; margin-top:10px; }
+    .jx-panel-sub { font-family:var(--mono,monospace); font-size:10.5px; letter-spacing:.04em; color:var(--fg-2,rgba(220,232,255,.58)); margin-top:6px; }
+    .jx-panel-body { font-size:12.5px; line-height:1.55; color:var(--fg-1,rgba(220,232,255,.78)); margin-top:12px; }
+    .jx-panel-div { height:1px; background:var(--line-1,rgba(220,232,255,.06)); margin:16px 0; }
+    .jx-panel-stats { display:grid; grid-template-columns:1fr 1fr; gap:14px 18px; }
+    .jx-stat .s-lbl { font-family:var(--mono,monospace); font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.4)); }
+    .jx-stat .s-val { font-family:var(--serif,"Geist"); font-weight:300; font-size:22px; letter-spacing:-.02em; color:var(--fg-0,#DCE8FF); line-height:1; margin-top:5px; font-variant-numeric:tabular-nums; }
+    .jx-stat .s-val .u { font-family:var(--mono,monospace); font-size:10px; color:var(--fg-2,rgba(220,232,255,.58)); margin-left:3px; letter-spacing:.04em; }
+    .jx-chip { position:absolute; display:inline-flex; flex-direction:column; gap:3px; padding:9px 13px; border-radius:var(--r-2,8px); background:rgba(10,14,22,.74); border:1px solid var(--line-2,rgba(220,232,255,.1)); backdrop-filter:blur(16px) saturate(140%); -webkit-backdrop-filter:blur(16px) saturate(140%); }
+    .jx-chip .c-name { font-family:var(--serif,"Geist"); font-weight:400; font-size:15px; letter-spacing:-.01em; color:var(--fg-0,#DCE8FF); }
+    .jx-chip .c-meta { font-family:var(--mono,monospace); font-size:9.5px; letter-spacing:.08em; color:var(--fg-2,rgba(220,232,255,.58)); }
+    .jx-badge { display:inline-flex; align-items:center; gap:6px; font-family:var(--mono,monospace); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; padding:3px 7px; border-radius:var(--r-1,4px); border:1px solid var(--line-2,rgba(220,232,255,.1)); color:var(--fg-2,rgba(220,232,255,.58)); }
+    .jx-badge.green  { color:var(--green,#36D399); border-color:rgba(54,211,153,.32); background:var(--green-soft,rgba(54,211,153,.1)); }
+    .jx-badge.accent { color:var(--accent,#4A9EFF); border-color:var(--accent-line,rgba(74,158,255,.3)); background:var(--accent-soft,rgba(74,158,255,.1)); }
+    .jx-badge.gold   { color:var(--gold,#B8963E); border-color:rgba(184,150,62,.32); background:var(--gold-soft,rgba(184,150,62,.1)); }
+    .jx-badge .dot { width:5px; height:5px; border-radius:50%; background:currentColor; }
+    .jx-fade-in { animation:jx-fade .35s cubic-bezier(.2,.8,.25,1); }
+    @keyframes jx-fade { from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none; } }
+    @media (prefers-reduced-motion: reduce) { .jx-fade-in { animation:none; } }
+  `;
 
-  const PLANETS = [
+  function jxEnsureChromeCss() {
+    if (document.getElementById(JX_CHROME_CSS_ID)) return;
+    const s = document.createElement('style');
+    s.id = JX_CHROME_CSS_ID;
+    s.textContent = JX_CHROME_CSS;
+    document.head.appendChild(s);
+  }
+
+  function jxBrandMark(size) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 26 26" aria-hidden="true">
+      <circle cx="13" cy="13" r="10.5" fill="none" stroke="var(--accent,#4A9EFF)" stroke-width="1"/>
+      <circle cx="13" cy="13" r="6.5" fill="none" stroke="var(--accent,#4A9EFF)" stroke-width="1" opacity=".55"/>
+      <circle cx="13" cy="13" r="2" fill="var(--accent,#4A9EFF)"/></svg>`;
+  }
+
+  /* Construit la couche chrome commune. opts: {viewNum, viewName, status, voice, context[], nav, legend[]} */
+  function jxBuildChrome(opts) {
+    const c = document.createElement('div');
+    c.className = 'jx-chrome';
+    c.innerHTML = `
+      <div class="jx-brand">${jxBrandMark(26)}
+        <div class="jx-brand-txt">
+          <span class="jx-brand-word">JARVIS</span>
+          <span class="jx-brand-status">${opts.status || 'EN LIGNE · VOIX'}</span>
+        </div>
+      </div>
+      <div class="jx-eyebrow"><span class="vn">${opts.viewNum}</span><span class="sep">·</span><span>${opts.viewName}</span></div>
+      ${opts.context ? `<div class="jx-context">${opts.context.map((x, i) =>
+        (i ? '<span class="sep"></span>' : '') + `<span class="${x.muted ? 'muted' : ''}">${x.t}</span>`).join('')}</div>` : ''}
+      <div class="jx-voice">
+        <div class="vbars"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="vtxt">${opts.voice || 'Jarvis · <b>à l\u2019écoute</b>'}</div>
+      </div>
+      ${opts.nav ? `<div class="jx-navhint">${opts.nav}</div>` : ''}
+      ${opts.legend ? `<div class="jx-legend">${opts.legend.map(r =>
+        `<div class="lg-row">${r.sw ? `<span class="lg-sw" style="background:${r.sw}"></span>` : ''}<span>${r.t}</span></div>`).join('')}</div>` : ''}
+    `;
+    return c;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────
+     DONNÉES — constellations en coordonnées virtuelles 1280×720.
+     ───────────────────────────────────────────────────────────────────── */
+  const VW = 1280, VH = 720;
+  const CONST = [
     {
-      name: 'Mercure',
-      radius: 3.8,
-      orbitRadius: 80,
-      period: 88,
-      color: '#a8998a',
-      emoji: '☿',
-      distance: '57,9 M km du Soleil',
-      diameter: '4 879 km',
-      moons: 0,
-      facts: [
-        'Planète la plus proche du Soleil',
-        'Un jour dure 59 jours terrestres',
-        'Amplitude thermique extrême : −180 °C à 430 °C',
-      ],
+      id: 'orion', name: 'Orion', fr: 'Le Chasseur', sub: 'α Bételgeuse · 7 étoiles',
+      stars: [[612,300,2.6],[690,316,2.2],[628,374,2.0],[649,379,2.2],[670,384,2.0],[622,448,1.9],[694,442,2.6]],
+      lines: [[0,2],[1,4],[2,3],[3,4],[2,5],[4,6],[0,1]],
+      stats: [['Étoiles','7',''],['Magnitude','0.4',''],['Distance','643','al'],['Au zénith','23:48','']],
+      body: 'Visible plein sud. Bételgeuse, supergéante rouge, marque l\u2019épaule. La Ceinture pointe vers Sirius.',
     },
     {
-      name: 'Vénus',
-      radius: 9.5,
-      orbitRadius: 130,
-      period: 225,
-      color: '#e8cda0',
-      emoji: '♀',
-      distance: '108,2 M km du Soleil',
-      diameter: '12 104 km',
-      moons: 0,
-      facts: [
-        'Planète la plus chaude (462 °C en moyenne)',
-        'Tourne en sens inverse des autres planètes',
-        'Un jour vénusien dure plus qu\'un an vénusien',
-      ],
+      id: 'cassiopee', name: 'Cassiopée', fr: 'La Reine', sub: '5 étoiles · le W',
+      stars: [[206,168,2.2],[250,202,2.0],[296,172,2.4],[342,210,2.0],[384,178,2.1]],
+      lines: [[0,1],[1,2],[2,3],[3,4]],
+      stats: [['Étoiles','5',''],['Magnitude','2.2',''],['Distance','54','al'],['Circumpolaire','oui','']],
+      body: 'Le W caractéristique, toujours au-dessus de l\u2019horizon sous nos latitudes.',
     },
     {
-      name: 'Terre',
-      radius: 10,
-      orbitRadius: 188,
-      period: 365,
-      color: '#4a9eff',
-      emoji: '🌍',
-      distance: '149,6 M km du Soleil',
-      diameter: '12 742 km',
-      moons: 1,
-      facts: [
-        'Seule planète connue abritant la vie',
-        '71 % de la surface est couverte d\'eau',
-        'Âge estimé à 4,5 milliards d\'années',
-      ],
+      id: 'grande-ourse', name: 'Grande Ourse', fr: 'Ursa Major', sub: '7 étoiles · la Casserole',
+      stars: [[902,150,2.4],[902,200,2.0],[956,206,2.1],[956,156,2.0],[1002,150,2.2],[1046,160,1.9],[1086,150,2.3]],
+      lines: [[0,1],[1,2],[2,3],[3,0],[3,4],[4,5],[5,6]],
+      stats: [['Étoiles','7',''],['Magnitude','1.8',''],['Distance','81','al'],['Pointe','Polaire','']],
+      body: 'La Casserole. Le bord de la louche prolonge la ligne vers l\u2019étoile Polaire.',
     },
     {
-      name: 'Mars',
-      radius: 5.3,
-      orbitRadius: 255,
-      period: 687,
-      color: '#d14c3b',
-      emoji: '♂',
-      distance: '227,9 M km du Soleil',
-      diameter: '6 779 km',
-      moons: 2,
-      facts: [
-        'Abrite Olympus Mons, le plus grand volcan du système solaire',
-        'Atmosphère à 95 % de CO₂',
-        'Un jour martien dure 24 h 37 min',
-      ],
-    },
-    {
-      name: 'Jupiter',
-      radius: 22,
-      orbitRadius: 360,
-      period: 4333,
-      color: '#c88b5a',
-      emoji: '♃',
-      distance: '778,5 M km du Soleil',
-      diameter: '139 820 km',
-      moons: 95,
-      facts: [
-        'Plus grande planète du système solaire',
-        'La Grande Tache Rouge existe depuis 350 ans',
-        'Possède au moins 95 lunes confirmées',
-      ],
-    },
-    {
-      name: 'Saturne',
-      radius: 18,
-      orbitRadius: 460,
-      period: 10759,
-      color: '#e4c98a',
-      emoji: '♄',
-      distance: '1 432 M km du Soleil',
-      diameter: '116 460 km',
-      moons: 146,
-      facts: [
-        'Ses anneaux s\'étendent sur 282 000 km',
-        'Moins dense que l\'eau — flotterait dans un océan',
-        'Possède 146 lunes, dont Titan avec atmosphère épaisse',
-      ],
-    },
-    {
-      name: 'Uranus',
-      radius: 14,
-      orbitRadius: 550,
-      period: 30687,
-      color: '#7de8e8',
-      emoji: '⛢',
-      distance: '2 871 M km du Soleil',
-      diameter: '50 724 km',
-      moons: 27,
-      facts: [
-        'Inclinée à 98° — tourne presque "sur le côté"',
-        'Température minimale : −224 °C (la plus froide)',
-        'Ses anneaux sont orientés verticalement',
-      ],
-    },
-    {
-      name: 'Neptune',
-      radius: 13,
-      orbitRadius: 630,
-      period: 60190,
-      color: '#3f6fff',
-      emoji: '♆',
-      distance: '4 495 M km du Soleil',
-      diameter: '49 244 km',
-      moons: 16,
-      facts: [
-        'Vents les plus rapides du système solaire (2 100 km/h)',
-        'Planète la plus éloignée du Soleil',
-        'Un an neptunien dure 165 ans terrestres',
-      ],
+      id: 'cygne', name: 'Cygne', fr: 'Croix du Nord', sub: '5 étoiles · la Croix',
+      stars: [[372,470,2.5],[396,532,2.1],[418,596,1.9],[330,520,2.0],[460,544,2.0]],
+      lines: [[0,1],[1,2],[3,1],[1,4]],
+      stats: [['Étoiles','5',''],['Magnitude','1.3',''],['Distance','2615','al'],['Deneb','α Cyg','']],
+      body: 'La Croix du Nord file le long de la Voie lactée. Deneb en marque la tête.',
     },
   ];
+  CONST.forEach((c) => {
+    c.cx = c.stars.reduce((a, s) => a + s[0], 0) / c.stars.length;
+    c.cy = c.stars.reduce((a, s) => a + s[1], 0) / c.stars.length;
+  });
 
-  const SUN = {
-    name: 'Soleil',
-    radius: 32,
-    color: '#ffe04a',
-    glowColor: 'rgba(255,200,40,0.18)',
-    diameter: '1 392 700 km',
-    distance: 'Centre du système solaire',
-    facts: [
-      'Représente 99,86 % de la masse du système solaire',
-      'Surface à 5 500 °C, cœur à 15 millions °C',
-      'La lumière met 8 min 20 s pour atteindre la Terre',
-    ],
-  };
+  /* Combinaison FIGÉE (validée) : Orion par défaut, voile léger, nom géant, ciel dense. */
+  const FROZEN = { focusId: 'orion', dim: 0.45, nameSize: 104, density: 340 };
 
-  // ── État interne ──────────────────────────────────────────────────────────────
+  /* ─────────────────────────────────────────────────────────────────────
+     État interne
+     ───────────────────────────────────────────────────────────────────── */
+  let container = null, canvas = null, ctx = null, animFrame = null, ro = null;
+  let chromeEl = null, overlayEl = null, _visible = false;
+  let stars = [];
+  let W = 0, H = 0, cover = 1;
+  let focusId = null;            // null = vue d'ensemble ; sinon id constellation
+  let dim = 0, targetDim = 0;    // voile animé
+  let zoom = 1, targetZoom = 1;  // zoom caméra animé
+  let camX = VW / 2, camY = VH / 2, targetCamX = VW / 2, targetCamY = VH / 2;
+  let clickHandler = null, moveHandler = null;
 
-  let container = null;
-  let canvas = null;
-  let ctx = null;
-  let animFrame = null;
-  let infoPanel = null;
-  let toastTimer = null;
-  let time = 0;
-  let focusedPlanet = null;
-  let cameraX = 0;
-  let cameraY = 0;
-  let targetCameraX = 0;
-  let targetCameraY = 0;
-  let scale = 1;
-  let targetScale = 1;
-  let flyAnimation = null;
-
-  // ── Helpers ───────────────────────────────────────────────────────────────────
-
-  function lerp(a, b, t) {
-    return a + (b - a) * t;
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  function findConst(name) {
+    const n = norm(name);
+    return CONST.find((c) => norm(c.name) === n || norm(c.id) === n || norm(c.name).startsWith(n) || norm(c.fr).includes(n));
   }
 
-  function getPlanetAngle(planet, t) {
-    return (t / planet.period) * Math.PI * 2;
+  /* mapping virtuel → écran (avec caméra zoom, ancre verticale à 42% en focus) */
+  function anchorY() { return focusId ? H * 0.42 : H * 0.5; }
+  function mapX(vx) { return W / 2 + (vx - camX) * cover * zoom; }
+  function mapY(vy) { return anchorY() + (vy - camY) * cover * zoom; }
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Rendu
+     ───────────────────────────────────────────────────────────────────── */
+  function makeStars(n) {
+    const arr = [];
+    for (let i = 0; i < n; i++) {
+      const t = Math.random();
+      const tint = t < 0.05 ? '#9cc4ff' : (t < 0.08 ? '#d9c79a' : '#DCE8FF');
+      arr.push({
+        x: Math.random(), y: Math.random(),
+        r: Math.random() < 0.78 ? Math.random() * 1.1 + 0.6 : Math.random() * 1.6 + 1.6,
+        base: Math.random() * 0.4 + 0.35, amp: Math.random() * 0.3 + 0.12,
+        sp: Math.random() * 1.6 + 0.4, ph: Math.random() * 6.28, tint,
+      });
+    }
+    return arr;
   }
 
-  function getPlanetPos(planet, t) {
-    const angle = getPlanetAngle(planet, t);
-    return {
-      x: Math.cos(angle) * planet.orbitRadius,
-      y: Math.sin(angle) * planet.orbitRadius,
-    };
-  }
-
-  function findPlanet(name) {
-    const normalized = name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-    return PLANETS.find(p => {
-      const pn = p.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-      return pn === normalized || pn.startsWith(normalized);
+  function drawConst(c, lit, t) {
+    ctx.lineWidth = lit ? 1.7 : 1.1;
+    ctx.strokeStyle = lit ? 'rgba(74,158,255,.9)' : 'rgba(220,232,255,.18)';
+    if (lit) { ctx.shadowColor = '#4A9EFF'; ctx.shadowBlur = 9; }
+    ctx.beginPath();
+    c.lines.forEach(([a, b]) => {
+      ctx.moveTo(mapX(c.stars[a][0]), mapY(c.stars[a][1]));
+      ctx.lineTo(mapX(c.stars[b][0]), mapY(c.stars[b][1]));
     });
-  }
-
-  // ── Rendu ──────────────────────────────────────────────────────────────────────
-
-  function drawStars(w, h) {
-    // Champ d'étoiles déterministe basé sur la taille du canvas
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    const seed = 42;
-    let s = seed;
-    function rand() {
-      s = (s * 1664525 + 1013904223) & 0xffffffff;
-      return (s >>> 0) / 0xffffffff;
-    }
-    for (let i = 0; i < 220; i++) {
-      const x = rand() * w;
-      const y = rand() * h;
-      const r = rand() * 1.2 + 0.2;
-      const alpha = rand() * 0.5 + 0.3;
-      ctx.globalAlpha = alpha;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    c.stars.forEach(([x, y, m]) => {
+      const tw = lit ? 1 : 0.85 + 0.15 * Math.sin(t * 1.4 + x);
+      ctx.globalAlpha = tw;
+      ctx.shadowColor = lit ? 'rgba(160,200,255,.95)' : 'rgba(220,232,255,.5)';
+      ctx.shadowBlur = lit ? 13 : 5;
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.arc(mapX(x), mapY(y), m * (lit ? 1.6 : 1.15), 0, 6.2832);
+      ctx.fillStyle = '#EAF1FF';
       ctx.fill();
-    }
+      ctx.shadowBlur = 0;
+    });
     ctx.globalAlpha = 1;
   }
 
-  function drawSun(cx, cy) {
-    // Halo extérieur
-    const glow = ctx.createRadialGradient(cx, cy, SUN.radius * scale * 0.5, cx, cy, SUN.radius * scale * 3.5);
-    glow.addColorStop(0, 'rgba(255,210,60,0.22)');
-    glow.addColorStop(1, 'rgba(255,180,0,0)');
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(cx, cy, SUN.radius * scale * 3.5, 0, Math.PI * 2);
-    ctx.fill();
+  function render(ts) {
+    const t = (ts || 0) / 1000;
+    dim = lerp(dim, targetDim, 0.08);
+    zoom = lerp(zoom, targetZoom, 0.08);
+    camX = lerp(camX, targetCamX, 0.08);
+    camY = lerp(camY, targetCamY, 0.08);
 
-    // Corps
-    const grad = ctx.createRadialGradient(cx - SUN.radius * scale * 0.25, cy - SUN.radius * scale * 0.25, 0, cx, cy, SUN.radius * scale);
-    grad.addColorStop(0, '#fff7b0');
-    grad.addColorStop(0.45, '#ffe04a');
-    grad.addColorStop(1, '#ff8c00');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(cx, cy, SUN.radius * scale, 0, Math.PI * 2);
-    ctx.fill();
-  }
+    ctx.clearRect(0, 0, W, H);
+    // fond
+    ctx.fillStyle = '#06080D';
+    ctx.fillRect(0, 0, W, H);
+    // bande nébuleuse très diluée
+    const g = ctx.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, 'rgba(74,158,255,.05)');
+    g.addColorStop(0.5, 'rgba(74,158,255,0)');
+    g.addColorStop(1, 'rgba(184,150,62,.03)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
 
-  function drawOrbit(cx, cy, orbitRadius) {
-    ctx.beginPath();
-    ctx.arc(cx, cy, orbitRadius * scale, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  }
-
-  function drawPlanet(planet, cx, cy, pos, isSelected) {
-    const px = cx + pos.x * scale;
-    const py = cy + pos.y * scale;
-    const r = planet.radius * scale;
-
-    // Halo de sélection
-    if (isSelected) {
+    // champ d'étoiles plein écran (indépendant de la caméra)
+    for (const s of stars) {
+      const a = Math.max(0.05, s.base + s.amp * Math.sin(t * s.sp + s.ph));
+      ctx.globalAlpha = a;
       ctx.beginPath();
-      ctx.arc(px, py, r + 6 * scale, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255,255,255,0.45)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      ctx.arc(s.x * W, s.y * H, s.r, 0, 6.2832);
+      ctx.fillStyle = s.tint;
+      ctx.fill();
     }
+    ctx.globalAlpha = 1;
 
-    // Anneaux de Saturne
-    if (planet.name === 'Saturne') {
-      ctx.save();
-      ctx.translate(px, py);
-      ctx.scale(1, 0.35);
-      ctx.beginPath();
-      ctx.arc(0, 0, r * 1.9, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(228,201,138,0.5)';
-      ctx.lineWidth = r * 0.5;
-      ctx.stroke();
-      ctx.restore();
+    if (!focusId) {
+      // vue d'ensemble : toutes les constellations tracées faiblement
+      CONST.forEach((c) => drawConst(c, false, t));
+    } else {
+      // voile + constellation focalisée illuminée et zoomée
+      if (dim > 0.01) { ctx.fillStyle = `rgba(6,8,13,${dim})`; ctx.fillRect(0, 0, W, H); }
+      const c = CONST.find((x) => x.id === focusId);
+      if (c) drawConst(c, true, t);
     }
-
-    // Corps de la planète
-    const grad = ctx.createRadialGradient(px - r * 0.3, py - r * 0.3, 0, px, py, r);
-    grad.addColorStop(0, lighten(planet.color, 0.4));
-    grad.addColorStop(1, darken(planet.color, 0.45));
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(px, py, r, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Label
-    if (scale > 0.65) {
-      ctx.fillStyle = 'rgba(255,255,255,0.75)';
-      ctx.font = `${Math.max(9, 11 * scale)}px monospace`;
-      ctx.textAlign = 'center';
-      ctx.fillText(planet.name, px, py + r + 14 * scale);
-    }
-  }
-
-  function lighten(hex, amt) {
-    const n = parseInt(hex.slice(1), 16);
-    const r = Math.min(255, ((n >> 16) & 0xff) + Math.round(255 * amt));
-    const g = Math.min(255, ((n >> 8) & 0xff) + Math.round(255 * amt));
-    const b = Math.min(255, (n & 0xff) + Math.round(255 * amt));
-    return `rgb(${r},${g},${b})`;
-  }
-
-  function darken(hex, amt) {
-    const n = parseInt(hex.slice(1), 16);
-    const r = Math.max(0, ((n >> 16) & 0xff) - Math.round(255 * amt));
-    const g = Math.max(0, ((n >> 8) & 0xff) - Math.round(255 * amt));
-    const b = Math.max(0, (n & 0xff) - Math.round(255 * amt));
-    return `rgb(${r},${g},${b})`;
-  }
-
-  function render() {
-    if (!canvas || !ctx) return;
-    const w = canvas.width;
-    const h = canvas.height;
-
-    // Smooth camera
-    cameraX = lerp(cameraX, targetCameraX, 0.07);
-    cameraY = lerp(cameraY, targetCameraY, 0.07);
-    scale = lerp(scale, targetScale, 0.07);
-
-    ctx.clearRect(0, 0, w, h);
-
-    // Fond noir spatial
-    ctx.fillStyle = '#05050f';
-    ctx.fillRect(0, 0, w, h);
-
-    drawStars(w, h);
-
-    const cx = w / 2 - cameraX;
-    const cy = h / 2 - cameraY;
-
-    // Orbites
-    PLANETS.forEach(p => drawOrbit(cx, cy, p.orbitRadius));
-
-    // Soleil
-    drawSun(cx, cy);
-
-    // Planètes
-    time += 0.18;
-    PLANETS.forEach(p => {
-      const pos = getPlanetPos(p, time);
-      drawPlanet(p, cx, cy, pos, focusedPlanet && focusedPlanet.name === p.name);
-    });
 
     animFrame = requestAnimationFrame(render);
   }
 
-  // ── Panneau d'infos ───────────────────────────────────────────────────────────
-
-  function showInfoPanel(obj) {
-    if (!container) return;
-    removeInfoPanel();
-
-    infoPanel = document.createElement('div');
-    Object.assign(infoPanel.style, {
-      position: 'absolute',
-      top: '50%',
-      right: '32px',
-      transform: 'translateY(-50%)',
-      background: 'rgba(10,10,22,0.88)',
-      color: 'var(--fg-1,#e8e8e8)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      backdropFilter: 'blur(12px)',
-      borderRadius: '14px',
-      padding: '24px 28px',
-      minWidth: '260px',
-      maxWidth: '300px',
-      fontFamily: 'monospace',
-      fontSize: '13px',
-      lineHeight: '1.7',
-      zIndex: '4',
-      opacity: '0',
-      transition: 'opacity .3s',
-      pointerEvents: 'none',
+  /* ─────────────────────────────────────────────────────────────────────
+     Chrome dynamique (eyebrow context + panneau / nom selon l'état)
+     ───────────────────────────────────────────────────────────────────── */
+  function rebuildChrome() {
+    if (chromeEl) chromeEl.remove();
+    if (overlayEl) { overlayEl.remove(); overlayEl = null; }
+    const focusing = !!focusId;
+    const c = focusing ? CONST.find((x) => x.id === focusId) : null;
+    chromeEl = jxBuildChrome({
+      viewNum: '01', viewName: 'CARTE DU CIEL',
+      status: 'EN LIGNE · VOIX',
+      voice: focusing ? `Jarvis · <b>${c.name}</b>` : 'Jarvis · <b>affiche-moi le ciel</b>',
+      context: [{ muted: true, t: focusing ? 'FOCUS · ' + c.name.toUpperCase() : 'CIEL · PARIS' },
+                focusing ? null : { t: '337 étoiles' }].filter(Boolean),
+      nav: focusing ? '<span class="k">esc</span> vue d\u2019ensemble'
+                    : '<b>survol</b> mettre au point · <span class="k">↵</span> nommer',
+      legend: focusing ? null : [
+        { sw: 'rgba(220,232,255,.9)', t: 'ÉTOILE · mag < 2' },
+        { sw: 'rgba(74,158,255,.85)', t: 'TRACÉ CONSTELLATION' },
+      ],
     });
+    container.appendChild(chromeEl);
 
-    const isSun = obj === SUN;
-    const color = isSun ? SUN.color : obj.color;
-
-    infoPanel.innerHTML = `
-      <div style="font-size:22px;margin-bottom:10px;text-align:center;">${isSun ? '☀️' : obj.emoji}</div>
-      <div style="font-size:16px;font-weight:700;color:${color};margin-bottom:12px;text-align:center;letter-spacing:.04em;">${obj.name}</div>
-      <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">
-        <div><span style="color:rgba(255,255,255,0.45);">Diamètre</span><br>${obj.diameter}</div>
-        <div style="margin-top:8px;"><span style="color:rgba(255,255,255,0.45);">Distance</span><br>${obj.distance}</div>
-        ${!isSun ? `<div style="margin-top:8px;"><span style="color:rgba(255,255,255,0.45);">Lunes</span><br>${obj.moons}</div>` : ''}
-      </div>
-      <div style="border-top:1px solid rgba(255,255,255,0.08);margin-top:12px;padding-top:10px;">
-        <div style="color:rgba(255,255,255,0.45);margin-bottom:6px;">Faits clés</div>
-        ${obj.facts.map(f => `<div style="margin-bottom:5px;padding-left:8px;border-left:2px solid ${color}50;">${f}</div>`).join('')}
-      </div>
-    `;
-
-    container.appendChild(infoPanel);
-    requestAnimationFrame(() => { infoPanel.style.opacity = '1'; });
-  }
-
-  function removeInfoPanel() {
-    if (infoPanel && infoPanel.parentNode) {
-      infoPanel.parentNode.removeChild(infoPanel);
+    // overlay focus : grand nom serif + stats, bas-gauche
+    if (focusing && c) {
+      const o = document.createElement('div');
+      Object.assign(o.style, { position: 'absolute', left: '44px', bottom: '92px', zIndex: '7',
+        display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '60%' });
+      o.innerHTML = `
+        <div style="font-family:var(--mono,monospace);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--fg-3,rgba(220,232,255,.4))">CONSTELLATION · ${c.fr.toUpperCase()}</div>
+        <div style="font-family:var(--serif,'Geist');font-weight:300;font-size:${FROZEN.nameSize}px;letter-spacing:-.04em;color:var(--fg-0,#DCE8FF);line-height:.9">${c.name}</div>
+        <div style="display:flex;gap:32px;margin-top:6px;flex-wrap:wrap">
+          ${c.stats.map(([l, v, u]) => `<div>
+            <div style="font-family:var(--mono,monospace);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3,rgba(220,232,255,.4))">${l}</div>
+            <div style="font-family:var(--serif,'Geist');font-weight:300;font-size:24px;letter-spacing:-.02em;color:var(--fg-0,#DCE8FF);margin-top:4px;font-variant-numeric:tabular-nums">${v}${u ? ' ' + u : ''}</div>
+          </div>`).join('')}
+        </div>`;
+      container.appendChild(o);
+      overlayEl = o;
+    } else {
+      overlayEl = null;
     }
-    infoPanel = null;
   }
 
-  // ── Toast ────────────────────────────────────────────────────────────────────
-
-  function showToast(msg) {
-    clearTimeout(toastTimer);
-    let toast = container && container.querySelector('.ast-toast');
-    if (!toast && container) {
-      toast = document.createElement('div');
-      toast.className = 'ast-toast';
-      Object.assign(toast.style, {
-        position: 'absolute',
-        bottom: '32px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        background: 'rgba(10,10,22,0.88)',
-        color: 'var(--fg-1,#e8e8e8)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        backdropFilter: 'blur(8px)',
-        padding: '8px 20px',
-        borderRadius: '999px',
-        fontSize: '13px',
-        letterSpacing: '.03em',
-        fontFamily: 'monospace',
-        pointerEvents: 'none',
-        zIndex: '4',
-        opacity: '0',
-        transition: 'opacity .2s',
-        whiteSpace: 'nowrap',
-      });
-      container.appendChild(toast);
-    }
-    if (!toast) return;
-    toast.textContent = msg;
-    toast.style.opacity = '1';
-    toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 3200);
+  /* ─────────────────────────────────────────────────────────────────────
+     Transitions d'état
+     ───────────────────────────────────────────────────────────────────── */
+  function focusConstellation(c) {
+    focusId = c.id;
+    targetDim = FROZEN.dim;
+    targetZoom = 1.7;
+    targetCamX = c.cx;
+    targetCamY = c.cy;
+    rebuildChrome();
+  }
+  function overview() {
+    focusId = null;
+    targetDim = 0;
+    targetZoom = 1;
+    targetCamX = VW / 2;
+    targetCamY = VH / 2;
+    rebuildChrome();
   }
 
-  // ── Container ────────────────────────────────────────────────────────────────
+  /* hit-test : constellation la plus proche du clic (espace écran) */
+  function constAt(sx, sy) {
+    let best = null, bestD = 60 * cover;
+    CONST.forEach((c) => {
+      const d = Math.hypot(mapX(c.cx) - sx, mapY(c.cy) - sy);
+      if (d < bestD) { bestD = d; best = c; }
+    });
+    return best;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Container
+     ───────────────────────────────────────────────────────────────────── */
+  function resize() {
+    W = container.offsetWidth || window.innerWidth;
+    H = container.offsetHeight || window.innerHeight;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cover = Math.max(W / VW, H / VH);
+  }
 
   function ensureContainer() {
     if (container) return;
+    jxEnsureChromeCss();
+
+    const s = document.createElement('style');
+    s.id = STYLE_ID;
+    s.textContent = `
+      #astronomy-container { background:var(--bg-0,#06080D); overflow:hidden; }
+      #astronomy-container canvas { width:100%; height:100%; display:block; cursor:crosshair; }
+    `;
+    document.head.appendChild(s);
 
     container = document.createElement('div');
     container.id = `${VIEW_ID}-container`;
     Object.assign(container.style, {
-      position: 'fixed',
-      inset: '0',
-      zIndex: '2',
-      background: '#05050f',
-      opacity: '0',
-      transition: 'opacity .35s ease',
-      display: 'none',
-      overflow: 'hidden',
+      position: 'fixed', inset: '0', zIndex: '2',
+      background: 'var(--bg-0,#06080D)', opacity: '0',
+      transition: 'opacity .35s ease', display: 'none', overflow: 'hidden',
     });
 
     canvas = document.createElement('canvas');
-    canvas.style.cssText = 'width:100%;height:100%;display:block;';
     container.appendChild(canvas);
-
-    const resizeCanvas = () => {
-      canvas.width = container.offsetWidth || window.innerWidth;
-      canvas.height = container.offsetHeight || window.innerHeight;
-      ctx = canvas.getContext('2d');
-    };
-    resizeCanvas();
-
-    const ro = new ResizeObserver(resizeCanvas);
-    ro.observe(container);
-    container._ro = ro;
-
-    // Interaction souris — clic sur planète
-    canvas.addEventListener('click', e => {
-      const rect = canvas.getBoundingClientRect();
-      const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
-      const my = (e.clientY - rect.top) * (canvas.height / rect.height);
-      const cx = canvas.width / 2 - cameraX;
-      const cy = canvas.height / 2 - cameraY;
-
-      // Test Soleil
-      const dx0 = mx - cx, dy0 = my - cy;
-      if (Math.sqrt(dx0 * dx0 + dy0 * dy0) < SUN.radius * scale + 6) {
-        _focusObject(SUN);
-        return;
-      }
-
-      for (const p of PLANETS) {
-        const pos = getPlanetPos(p, time);
-        const px = cx + pos.x * scale;
-        const py = cy + pos.y * scale;
-        const dx = mx - px, dy = my - py;
-        if (Math.sqrt(dx * dx + dy * dy) < p.radius * scale + 10) {
-          _doFocusPlanet(p);
-          return;
-        }
-      }
-    });
-
     document.body.appendChild(container);
+
+    resize();
+    ro = new ResizeObserver(resize);
+    ro.observe(container);
+
+    clickHandler = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+      if (focusId) { overview(); return; }
+      const c = constAt(sx, sy);
+      if (c) focusConstellation(c);
+    };
+    moveHandler = (e) => {
+      if (focusId) return;
+      const rect = canvas.getBoundingClientRect();
+      canvas.style.cursor = constAt(e.clientX - rect.left, e.clientY - rect.top) ? 'pointer' : 'crosshair';
+    };
+    canvas.addEventListener('click', clickHandler);
+    canvas.addEventListener('mousemove', moveHandler);
   }
 
-  // ── Logique de focus ──────────────────────────────────────────────────────────
-
-  function _doFocusPlanet(planet) {
-    focusedPlanet = planet;
-    const pos = getPlanetPos(planet, time);
-    targetCameraX = pos.x * targetScale;
-    targetCameraY = pos.y * targetScale;
-    targetScale = Math.min(2.2, 680 / planet.orbitRadius);
-    showInfoPanel(planet);
-    showToast(`${planet.emoji} ${planet.name}`);
-  }
-
-  function _focusObject(obj) {
-    if (obj === SUN) {
-      focusedPlanet = null;
-      targetCameraX = 0;
-      targetCameraY = 0;
-      targetScale = 1;
-      showInfoPanel(SUN);
-      showToast('☀️ Soleil');
-    }
-  }
-
-  function _solarSystemView() {
-    focusedPlanet = null;
-    targetCameraX = 0;
-    targetCameraY = 0;
-    targetScale = 1;
-    removeInfoPanel();
-    showToast('Système solaire');
-  }
-
-  // ── Enregistrement ───────────────────────────────────────────────────────────
-
+  /* ─────────────────────────────────────────────────────────────────────
+     Enregistrement
+     ───────────────────────────────────────────────────────────────────── */
   Jarvis.views.register(VIEW_ID, {
     meta: {
-      name: 'Astronomy',
-      desc: 'Système solaire interactif — planètes et faits astronomiques',
-      glyph: 'AST',
-      tags: ['astronomie', 'espace', 'planètes', '3D'],
+      name: 'Carte du ciel',
+      desc: 'Voûte céleste — constellations qui s\u2019illuminent au focus, faits stellaires',
+      glyph: 'SKY',
+      tags: ['astronomie', 'ciel', 'constellations', 'étoiles'],
     },
 
     show(params = {}) {
       ensureContainer();
-      if (container.style.display !== 'none') return;
+      if (_visible) return;
+      _visible = true;
 
       container.style.display = 'block';
       container.getBoundingClientRect();
       container.style.opacity = '1';
 
+      stars = makeStars(FROZEN.density);
+      // état initial : vue d'ensemble, sauf si une constellation est demandée
+      const req = params.constellation || params.name;
+      const c = req ? findConst(req) : null;
+      if (c) { focusId = c.id; dim = targetDim = FROZEN.dim; zoom = targetZoom = 1.7; camX = targetCamX = c.cx; camY = targetCamY = c.cy; }
+      else { focusId = null; dim = targetDim = 0; zoom = targetZoom = 1; camX = targetCamX = VW / 2; camY = targetCamY = VH / 2; }
+      rebuildChrome();
       if (!animFrame) render();
     },
 
     hide() {
       if (!container) return;
+      _visible = false;
       container.style.opacity = '0';
-      setTimeout(() => {
-        if (container) container.style.display = 'none';
-      }, 360);
-      if (animFrame) {
-        cancelAnimationFrame(animFrame);
-        animFrame = null;
-      }
+      if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+      setTimeout(() => { if (!_visible && container) container.style.display = 'none'; }, 360);
     },
 
     command(cmd, params = {}) {
       switch (cmd) {
-        case 'solar_system':
-          _solarSystemView();
+        case 'overview':
+        case 'sky':
+          overview();
           break;
-
-        case 'focus_planet': {
-          const name = params.planet || '';
-          const planet = findPlanet(name);
-          if (planet) {
-            _doFocusPlanet(planet);
-          } else {
-            showToast(`Planète inconnue : ${name}`);
-          }
+        case 'focus_constellation': {
+          const c = findConst(params.constellation || params.name || '');
+          if (c) focusConstellation(c);
           break;
         }
-
-        case 'fly_to_object': {
-          const name = (params.object_name || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-          if (name.includes('soleil') || name.includes('sun')) {
-            _focusObject(SUN);
-            break;
-          }
-          const planet = findPlanet(params.object_name || '');
-          if (planet) {
-            _doFocusPlanet(planet);
-          } else {
-            showToast(`Objet inconnu : ${params.object_name}`);
-          }
-          break;
-        }
-
-        // Commandes inconnues silencieusement ignorées
+        // commandes inconnues ignorées silencieusement
       }
     },
   });
