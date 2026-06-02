@@ -327,6 +327,22 @@
       "static_files": [],
       "requires_tools": [],
       "requires_env": []
+    },
+    {
+      "name": "system-monitor",
+      "version": "1.0.0",
+      "author": "Grominet95",
+      "description": "Dashboard système temps réel — CPU, RAM, disque, cerveau LLM et services Jarvis",
+      "tags": [
+        "système",
+        "monitoring",
+        "dashboard",
+        "performance"
+      ],
+      "path": "views/system-monitor",
+      "static_files": [],
+      "requires_tools": [],
+      "requires_env": []
     }
   ]
 }
