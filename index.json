@@ -261,6 +261,22 @@
   ],
   "views": [
     {
+      "name": "astronomy",
+      "version": "1.0.0",
+      "author": "Grominet95",
+      "description": "Système solaire interactif 3D — visualise planètes, orbites et faits astronomiques",
+      "tags": [
+        "astronomie",
+        "espace",
+        "planètes",
+        "3D"
+      ],
+      "path": "views/astronomy",
+      "static_files": [],
+      "requires_tools": [],
+      "requires_env": []
+    },
+    {
       "name": "command-center",
       "version": "1.0.0",
       "author": "Grominet95",
