@@ -1,32 +1,48 @@
 ---
 id: system-monitor
-name: "System Monitor"
-version: 1.0.0
+name: System Monitor
+version: 2.0.0
 author: Grominet95
-description: "Dashboard système temps réel — CPU, RAM, disque, cerveau LLM et services Jarvis"
+description: "Cockpit système temps réel — jauges CPU/RAM/disque, cerveau LLM, services, missions"
 tags: [système, monitoring, dashboard, performance]
-glyph: SYS
 commands:
   - action: show
-    description: Affiche le dashboard système en plein écran
+    description: Affiche le cockpit système en plein écran
   - action: hide
-    description: Masque le dashboard
+    description: Masque la vue
   - action: focus_metric
-    description: Met en avant une métrique précise avec animation de focus
+    description: Met une métrique en avant (surligne + agrandit la jauge)
     params:
-      metric: string
+      metric: string   # "cpu", "ram", "disk", "llm", "missions"
+  - action: overview
+    description: Retire le focus, revient à la vue d'ensemble
   - action: refresh
-    description: Force un rafraîchissement immédiat de toutes les données
+    description: Force un rafraîchissement immédiat des données
 ---
 
-Vue cockpit style Iron Man affichant l'état temps réel de la machine et des services Jarvis.
+# System Monitor — vue Jarvis
 
-**Métriques supportées pour `focus_metric`** : `cpu`, `ram`, `disk`, `llm`, `missions`.
+Parti pris **Cockpit** (validé) : **jauges radiales** à coloration par charge
+(bleu < 55 % · or < 80 % · rouge ≥ 80 %), **carte cerveau LLM** (provider,
+modèle, badge LOCAL/CLOUD, routes), **cartes de service**, **sparklines** et
+uptime. Densité confort.
 
-**Cross-platform** : compatible macOS et Windows. La batterie est masquée automatiquement si absente (desktop Windows).
+## Données RÉELLES (inchangées vs version d'origine)
 
-**Sources de données** (endpoints locaux Jarvis, aucune dépendance externe) :
-- `/api/system/perf` — métriques machine (CPU, RAM, disque, uptime, batterie, process) — polling 1,5 s
-- `/api/system/stats` — état Jarvis (missions, mémoire, sessions) — polling 7 s
-- `/api/proactive/status` — moteur proactif — polling 7 s
-- `/api/config/llm-status` — provider LLM actif sur chaque route — polling 7 s
+La vue interroge l'API Jarvis sur `window.location.origin` :
+
+| Endpoint | Cadence | Alimente |
+|---|---|---|
+| `GET /api/system/perf` | 1,5 s | CPU, RAM, disque, uptime, process, batterie |
+| `GET /api/system/stats` | 7 s | missions, mémoire, sessions |
+| `GET /api/proactive/status` | 7 s | moteur proactif |
+| `GET /api/config/llm-status` | 7 s | cerveau LLM (provider / modèle / routes) |
+
+Le **parsing des champs est strictement identique** à la version v1
+(tolérant aux variantes : `disk_pct`/`disk_used_pct`, `proc` objet ou liste,
+batterie masquée si `null`, etc.). Seule la **présentation** change (cockpit +
+chrome Jarvis commun). La batterie est masquée automatiquement sur desktop
+sans batterie.
+
+Remplace l'ancienne vue System Monitor en conservant l'**id
+`system-monitor`** et le **contrat de commandes** (`focus_metric`, `refresh`).
