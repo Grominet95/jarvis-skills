@@ -262,14 +262,14 @@
   "views": [
     {
       "name": "astronomy",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "author": "Grominet95",
-      "description": "Système solaire interactif 3D — visualise planètes, orbites et faits astronomiques",
+      "description": "Voûte céleste immersive — constellations qui s'illuminent au focus, faits stellaires",
       "tags": [
         "astronomie",
-        "espace",
-        "planètes",
-        "3D"
+        "ciel",
+        "constellations",
+        "étoiles"
       ],
       "path": "views/astronomy",
       "static_files": [],
@@ -277,17 +277,17 @@
       "requires_env": []
     },
     {
-      "name": "command-center",
+      "name": "clock",
       "version": "1.0.0",
       "author": "Grominet95",
-      "description": "Centre de commande proactif — initiatives en attente, missions actives et journal d'audit temps réel",
+      "description": "Horloge solaire — cadran 24 h, course du soleil, fuseaux Tokyo/New York/Londres",
       "tags": [
-        "initiatives",
-        "missions",
-        "proactif",
-        "dashboard"
+        "horloge",
+        "temps",
+        "fuseaux",
+        "soleil"
       ],
-      "path": "views/command-center",
+      "path": "views/clock",
       "static_files": [],
       "requires_tools": [],
       "requires_env": []
@@ -313,26 +313,10 @@
       "requires_env": []
     },
     {
-      "name": "memory-map",
-      "version": "1.0.0",
-      "author": "Grominet95",
-      "description": "Carte visuelle de la mémoire de Jarvis : sujets, souvenirs et données personnelles",
-      "tags": [
-        "mémoire",
-        "memory",
-        "knowledge",
-        "privacy"
-      ],
-      "path": "views/memory-map",
-      "static_files": [],
-      "requires_tools": [],
-      "requires_env": []
-    },
-    {
       "name": "system-monitor",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "author": "Grominet95",
-      "description": "Dashboard système temps réel — CPU, RAM, disque, cerveau LLM et services Jarvis",
+      "description": "Cockpit système temps réel — jauges CPU/RAM/disque, cerveau LLM, services, missions",
       "tags": [
         "système",
         "monitoring",
@@ -340,6 +324,22 @@
         "performance"
       ],
       "path": "views/system-monitor",
+      "static_files": [],
+      "requires_tools": [],
+      "requires_env": []
+    },
+    {
+      "name": "weather",
+      "version": "1.0.0",
+      "author": "Grominet95",
+      "description": "Météo immersive — scène de ciel animée, conditions et prévisions horaires (Open-Meteo)",
+      "tags": [
+        "météo",
+        "climat",
+        "prévisions",
+        "ciel"
+      ],
+      "path": "views/weather",
       "static_files": [],
       "requires_tools": [],
       "requires_env": []
