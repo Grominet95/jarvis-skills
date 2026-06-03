@@ -188,7 +188,6 @@
     const chrome = document.createElement('div');
     chrome.className = 'jx-chrome';
     chrome.innerHTML = `
-      <div class="jx-eyebrow"><span class="vn">04</span><span class="sep">·</span><span>SYSTÈME</span></div>
       <div class="jx-context">
         <span class="muted" id="sm-uptime">UPTIME —</span>
         <span class="sep"></span>
