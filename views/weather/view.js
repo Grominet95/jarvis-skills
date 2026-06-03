@@ -67,7 +67,6 @@
     const c = document.createElement('div');
     c.className = 'jx-chrome';
     c.innerHTML = `
-      <div class="jx-eyebrow"><span class="vn">${opts.viewNum}</span><span class="sep">·</span><span>${opts.viewName}</span></div>
       ${opts.context ? `<div class="jx-context">${opts.context.map((x, i) =>
         (i ? '<span class="sep"></span>' : '') + `<span class="${x.muted ? 'muted' : ''}">${x.t}</span>`).join('')}</div>` : ''}
       ${opts.nav ? `<div class="jx-navhint">${opts.nav}</div>` : ''}
