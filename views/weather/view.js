@@ -199,7 +199,7 @@
 
     // widget Conditions haut-droite
     widget = document.createElement('div');
-    Object.assign(widget.style, { position: 'absolute', right: '32px', top: '92px', zIndex: '7', width: '266px',
+    Object.assign(widget.style, { position: 'absolute', right: '32px', top: '200px', zIndex: '7', width: '266px',
       background: 'rgba(10,14,22,.7)', border: '1px solid var(--line-2,rgba(220,232,255,.1))', borderRadius: 'var(--r-4,16px)',
       backdropFilter: 'blur(18px) saturate(150%)', webkitBackdropFilter: 'blur(18px) saturate(150%)', padding: '18px',
       boxShadow: '0 24px 60px -24px rgba(0,0,0,.6)' });
