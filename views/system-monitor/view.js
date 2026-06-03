@@ -188,9 +188,6 @@
     const chrome = document.createElement('div');
     chrome.className = 'jx-chrome';
     chrome.innerHTML = `
-      <div class="jx-brand">${jxBrandMark(26)}
-        <div class="jx-brand-txt"><span class="jx-brand-word">JARVIS</span>
-        <span class="jx-brand-status">SYSTÈME · NOMINAL</span></div></div>
       <div class="jx-eyebrow"><span class="vn">04</span><span class="sep">·</span><span>SYSTÈME</span></div>
       <div class="jx-context">
         <span class="muted" id="sm-uptime">UPTIME —</span>
@@ -199,8 +196,6 @@
         <span class="sep"></span>
         <span id="sm-clock">—</span>
       </div>
-      <div class="jx-voice"><div class="vbars"><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="vtxt">Jarvis · <b>comment va le système</b></div></div>
       <div class="jx-navhint"><span class="k">↵</span> focus métrique</div>`;
 
     const content = document.createElement('div');
