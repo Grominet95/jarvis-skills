@@ -95,7 +95,6 @@
     const c = document.createElement('div');
     c.className = 'jx-chrome';
     c.innerHTML = `
-      <div class="jx-eyebrow"><span class="vn">${opts.viewNum}</span><span class="sep">·</span><span>${opts.viewName}</span></div>
       ${opts.context ? `<div class="jx-context">${opts.context.map((x, i) =>
         (i ? '<span class="sep"></span>' : '') + `<span class="${x.muted ? 'muted' : ''}">${x.t}</span>`).join('')}</div>` : ''}
       ${opts.nav ? `<div class="jx-navhint">${opts.nav}</div>` : ''}
@@ -155,6 +154,7 @@
   let stars = [];
   let W = 0, H = 0, cover = 1;
   let focusId = null;            // null = vue d'ensemble ; sinon id constellation
+  let hoverId = null;
   let dim = 0, targetDim = 0;    // voile animé
   let zoom = 1, targetZoom = 1;  // zoom caméra animé
   let camX = VW / 2, camY = VH / 2, targetCamX = VW / 2, targetCamY = VH / 2;
@@ -246,8 +246,13 @@
     ctx.globalAlpha = 1;
 
     if (!focusId) {
-      // vue d'ensemble : toutes les constellations tracées faiblement
       CONST.forEach((c) => drawConst(c, false, t));
+      if (hoverId) {
+        ctx.fillStyle = 'rgba(6,8,13,.35)';
+        ctx.fillRect(0, 0, W, H);
+        const hc = CONST.find((c) => c.id === hoverId);
+        if (hc) drawConst(hc, true, t);
+      }
     } else {
       // voile + constellation focalisée illuminée et zoomée
       if (dim > 0.01) { ctx.fillStyle = `rgba(6,8,13,${dim})`; ctx.fillRect(0, 0, W, H); }
@@ -274,10 +279,6 @@
                 focusing ? null : { t: '337 étoiles' }].filter(Boolean),
       nav: focusing ? '<span class="k">esc</span> vue d\u2019ensemble'
                     : '<b>survol</b> mettre au point · <span class="k">↵</span> nommer',
-      legend: focusing ? null : [
-        { sw: 'rgba(220,232,255,.9)', t: 'ÉTOILE · mag < 2' },
-        { sw: 'rgba(74,158,255,.85)', t: 'TRACÉ CONSTELLATION' },
-      ],
     });
     container.appendChild(chromeEl);
 
@@ -315,6 +316,7 @@
   }
   function overview() {
     focusId = null;
+    hoverId = null;
     targetDim = 0;
     targetZoom = 1;
     targetCamX = VW / 2;
@@ -382,12 +384,15 @@
       if (c) focusConstellation(c);
     };
     moveHandler = (e) => {
-      if (focusId) return;
+      if (focusId) { hoverId = null; return; }
       const rect = canvas.getBoundingClientRect();
-      canvas.style.cursor = constAt(e.clientX - rect.left, e.clientY - rect.top) ? 'pointer' : 'crosshair';
+      const hc = constAt(e.clientX - rect.left, e.clientY - rect.top);
+      hoverId = hc ? hc.id : null;
+      canvas.style.cursor = hoverId ? 'pointer' : 'crosshair';
     };
     canvas.addEventListener('click', clickHandler);
     canvas.addEventListener('mousemove', moveHandler);
+    canvas.addEventListener('mouseleave', () => { hoverId = null; });
   }
 
   /* ─────────────────────────────────────────────────────────────────────
