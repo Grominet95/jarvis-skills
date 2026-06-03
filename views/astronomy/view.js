@@ -95,19 +95,9 @@
     const c = document.createElement('div');
     c.className = 'jx-chrome';
     c.innerHTML = `
-      <div class="jx-brand">${jxBrandMark(26)}
-        <div class="jx-brand-txt">
-          <span class="jx-brand-word">JARVIS</span>
-          <span class="jx-brand-status">${opts.status || 'EN LIGNE · VOIX'}</span>
-        </div>
-      </div>
       <div class="jx-eyebrow"><span class="vn">${opts.viewNum}</span><span class="sep">·</span><span>${opts.viewName}</span></div>
       ${opts.context ? `<div class="jx-context">${opts.context.map((x, i) =>
         (i ? '<span class="sep"></span>' : '') + `<span class="${x.muted ? 'muted' : ''}">${x.t}</span>`).join('')}</div>` : ''}
-      <div class="jx-voice">
-        <div class="vbars"><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="vtxt">${opts.voice || 'Jarvis · <b>à l\u2019écoute</b>'}</div>
-      </div>
       ${opts.nav ? `<div class="jx-navhint">${opts.nav}</div>` : ''}
       ${opts.legend ? `<div class="jx-legend">${opts.legend.map(r =>
         `<div class="lg-row">${r.sw ? `<span class="lg-sw" style="background:${r.sw}"></span>` : ''}<span>${r.t}</span></div>`).join('')}</div>` : ''}
