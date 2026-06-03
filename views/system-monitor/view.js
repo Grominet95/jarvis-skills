@@ -129,7 +129,7 @@
     .sm-eyebrow { font-family:var(--mono,monospace); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.4)); }
 
     /* Palier 1 — jauges + cerveau */
-    .sm-top { display:grid; grid-template-columns:1fr 1fr 1fr 1.22fr; gap:16px; height:248px; flex-shrink:0; }
+    .sm-top { display:grid; grid-template-columns:1fr 1fr 1fr 1.22fr; gap:16px; height:248px; flex-shrink:0; align-items:start; }
     .sm-gauge { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:18px 14px; }
     .sm-gauge-label { position:absolute; top:16px; left:18px; }
     .sm-ringwrap { position:relative; width:150px; height:150px; flex-shrink:0; }
@@ -140,7 +140,7 @@
     .sm-ringsub { font-family:var(--mono,monospace); font-size:10.5px; color:var(--fg-3,rgba(220,232,255,.4)); letter-spacing:.04em; text-align:center; }
     .sm-focused { background:var(--accent-soft,rgba(74,158,255,.06)); border-color:var(--accent-line,rgba(74,158,255,.28)); }
     /* Cerveau */
-    .sm-brain { display:flex; flex-direction:column; justify-content:flex-start; gap:0; padding:22px; padding-top:108px; }
+    .sm-brain { display:flex; flex-direction:column; justify-content:flex-start; gap:0; padding:22px; margin-top:80px; }
     .sm-brain .sm-eyebrow { margin-bottom:8px; }
     .sm-brain-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .sm-brain-provider { font-size:17px; font-weight:500; color:var(--fg-0,#DCE8FF); letter-spacing:-.015em; }
