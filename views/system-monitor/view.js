@@ -120,49 +120,68 @@
   const rings = { cpu: null, ram: null, disk: null };
 
   /* ─── CSS de la vue ─────────────────────────────────────────────────────── */
+  /* Cockpit dense (3 paliers) — comme la maquette validée :
+     [ jauges CPU/RAM/DISQUE + cerveau ] / [ services + missions ] / [ bandeau bas ] */
   const CSS = `
     #system-monitor-container { font-family:var(--sans,"Geist",system-ui,sans-serif); color:var(--fg-1,rgba(220,232,255,.78)); background:var(--bg-0,#06080D); overflow:hidden; }
-    .sm-content { position:absolute; left:40px; right:40px; top:92px; bottom:92px; display:flex; flex-direction:column; gap:24px; z-index:3; }
-    .sm-grid { flex:1; display:grid; grid-template-columns:1fr 1fr 1fr 1.25fr; gap:18px; min-height:0; }
+    .sm-content { position:absolute; left:36px; right:36px; top:84px; bottom:84px; display:flex; flex-direction:column; gap:16px; z-index:3; }
     .sm-card { border:1px solid var(--line-1,rgba(220,232,255,.06)); border-radius:var(--r-3,12px); background:var(--bg-1,#0A0E16); position:relative; transition:background .3s, border-color .3s, transform .3s; }
-    .sm-gauge { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:22px 16px; }
-    .sm-gauge-label { position:absolute; top:16px; left:18px; font-family:var(--mono,monospace); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.4)); }
+    .sm-eyebrow { font-family:var(--mono,monospace); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.4)); }
+
+    /* Palier 1 — jauges + cerveau */
+    .sm-top { display:grid; grid-template-columns:1fr 1fr 1fr 1.22fr; gap:16px; height:248px; flex-shrink:0; }
+    .sm-gauge { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:18px 14px; }
+    .sm-gauge-label { position:absolute; top:16px; left:18px; }
     .sm-ringwrap { position:relative; width:150px; height:150px; flex-shrink:0; }
     .sm-ringwrap svg { position:absolute; inset:0; width:100%; height:100%; }
     .sm-ringval { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
     .sm-ringpct { font-family:var(--serif,"Geist"); font-weight:300; font-size:42px; letter-spacing:-.04em; color:var(--fg-0,#DCE8FF); line-height:1; font-variant-numeric:tabular-nums; }
     .sm-ringpct .u { font-family:var(--mono,monospace); font-size:13px; color:var(--fg-2,rgba(220,232,255,.58)); margin-left:2px; }
     .sm-ringsub { font-family:var(--mono,monospace); font-size:10.5px; color:var(--fg-3,rgba(220,232,255,.4)); letter-spacing:.04em; text-align:center; }
-    .sm-spark { width:80%; height:28px; display:block; }
     .sm-focused { background:var(--accent-soft,rgba(74,158,255,.06)); border-color:var(--accent-line,rgba(74,158,255,.28)); }
     /* Cerveau */
-    .sm-brain { display:flex; flex-direction:column; justify-content:center; gap:0; padding:24px 22px; }
-    .sm-eyebrow { font-family:var(--mono,monospace); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.4)); margin-bottom:8px; }
+    .sm-brain { display:flex; flex-direction:column; justify-content:center; gap:0; padding:22px; }
+    .sm-brain .sm-eyebrow { margin-bottom:8px; }
     .sm-brain-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .sm-brain-provider { font-size:17px; font-weight:500; color:var(--fg-0,#DCE8FF); letter-spacing:-.015em; }
     .sm-brain-model { font-family:var(--mono,monospace); font-size:11px; color:var(--fg-2,rgba(220,232,255,.5)); margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .sm-brain-div { height:1px; background:var(--line-1,rgba(220,232,255,.06)); margin:16px 0; }
+    .sm-brain-div { height:1px; background:var(--line-1,rgba(220,232,255,.06)); margin:14px 0; }
     .sm-route { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:4px 0; }
     .sm-route-k { font-family:var(--mono,monospace); font-size:9.5px; color:var(--fg-3,rgba(220,232,255,.32)); letter-spacing:.06em; }
-    .sm-route-v { font-family:var(--mono,monospace); font-size:9.5px; color:var(--fg-2,rgba(220,232,255,.58)); text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; }
-    /* Bas : services + process */
-    .sm-bot { height:108px; display:grid; grid-template-columns:1fr auto; gap:18px; flex-shrink:0; }
-    .sm-services { display:flex; border:1px solid var(--line-1,rgba(220,232,255,.06)); border-radius:var(--r-3,12px); background:var(--bg-1,#0A0E16); overflow:hidden; }
-    .sm-svc { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:5px; padding:0 22px; border-right:1px solid var(--line-1,rgba(220,232,255,.05)); }
-    .sm-svc:last-child { border-right:none; }
-    .sm-svc-l { font-family:var(--mono,monospace); font-size:8.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.36)); }
-    .sm-svc-v { font-size:15px; font-weight:500; color:var(--fg-0,#DCE8FF); white-space:nowrap; font-variant-numeric:tabular-nums; }
-    .sm-svc-v.green { color:var(--green,#36D399); } .sm-svc-v.off { color:var(--fg-3,rgba(220,232,255,.36)); }
-    .sm-svc-sub { font-family:var(--mono,monospace); font-size:9px; color:var(--fg-3,rgba(220,232,255,.3)); white-space:nowrap; }
-    .sm-bat-bg { width:48px; height:4px; background:rgba(220,232,255,.06); border-radius:2px; overflow:hidden; margin-top:2px; }
+    .sm-route-v { font-family:var(--mono,monospace); font-size:9.5px; color:var(--fg-2,rgba(220,232,255,.58)); text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:190px; }
+
+    /* Palier 2 — services + missions (remplit le milieu) */
+    .sm-mid { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:16px; min-height:0; }
+    .sm-panel { padding:20px 22px; display:flex; flex-direction:column; }
+    .sm-panel > .sm-eyebrow { margin-bottom:4px; flex-shrink:0; }
+    .sm-rows { display:flex; flex-direction:column; justify-content:center; flex:1; }
+    .sm-row { display:grid; grid-template-columns:1fr auto; align-items:center; gap:14px; padding:13px 0; border-top:1px solid var(--line-1,rgba(220,232,255,.06)); }
+    .sm-row:first-child { border-top:none; }
+    .sm-row-name { font-size:13px; color:var(--fg-1,rgba(220,232,255,.82)); }
+    .sm-row-name .sub { display:block; font-family:var(--mono,monospace); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.36)); margin-top:3px; }
+    .sm-row-v { font-family:var(--mono,monospace); font-size:12px; color:var(--fg-2,rgba(220,232,255,.62)); text-align:right; font-variant-numeric:tabular-nums; }
+    /* Missions hero */
+    .sm-mis-hero { display:flex; align-items:flex-end; gap:12px; margin:6px 0 14px; }
+    .sm-mis-num { font-family:var(--serif,"Geist"); font-weight:300; font-size:64px; line-height:.9; letter-spacing:-.04em; color:var(--fg-0,#DCE8FF); font-variant-numeric:tabular-nums; }
+    .sm-mis-lbl { font-family:var(--mono,monospace); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.4)); padding-bottom:8px; }
+    .sm-mis-track { height:3px; background:var(--bg-3,#161B26); border-radius:2px; overflow:hidden; margin:4px 0 16px; }
+    .sm-mis-fill { height:100%; width:0%; border-radius:2px; background:linear-gradient(90deg,var(--accent,#4A9EFF),#6BB0FF); transition:width .6s cubic-bezier(.4,0,.2,1); }
+    .sm-mis-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+    .sm-mis-stat .k { font-family:var(--mono,monospace); font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.4)); }
+    .sm-mis-stat .v { font-family:var(--serif,"Geist"); font-weight:300; font-size:24px; color:var(--fg-0,#DCE8FF); margin-top:5px; font-variant-numeric:tabular-nums; }
+
+    /* Palier 3 — bandeau bas (sparklines + valeurs) */
+    .sm-bot { height:104px; display:grid; grid-template-columns:repeat(4,1fr); gap:16px; flex-shrink:0; }
+    .sm-cell { padding:12px 16px; display:flex; flex-direction:column; gap:6px; justify-content:center; }
+    .sm-cell-l { font-family:var(--mono,monospace); font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.4)); }
+    .sm-cell-v { font-family:var(--serif,"Geist"); font-weight:300; font-size:22px; color:var(--fg-0,#DCE8FF); font-variant-numeric:tabular-nums; }
+    .sm-cell-v .u { font-family:var(--mono,monospace); font-size:11px; color:var(--fg-2,rgba(220,232,255,.58)); margin-left:2px; }
+    .sm-cell-sub { font-family:var(--mono,monospace); font-size:9.5px; color:var(--fg-3,rgba(220,232,255,.34)); }
+    .sm-spark { width:100%; height:26px; display:block; }
+    /* batterie (ligne service, masquée si absente) */
+    .sm-bat-bg { width:54px; height:4px; background:rgba(220,232,255,.06); border-radius:2px; overflow:hidden; display:inline-block; vertical-align:middle; margin-left:8px; }
     .sm-bat-fg { height:100%; border-radius:2px; background:var(--green,#36D399); transition:width .55s ease, background .3s; }
     .sm-bat-fg.warn { background:var(--gold,#B8963E); } .sm-bat-fg.crit { background:var(--red,#E5484D); }
-    .sm-process { display:flex; border:1px solid var(--line-1,rgba(220,232,255,.06)); border-radius:var(--r-3,12px); background:var(--bg-1,#0A0E16); }
-    .sm-proc { display:flex; flex-direction:column; justify-content:center; gap:5px; padding:0 26px; border-left:1px solid var(--line-1,rgba(220,232,255,.05)); }
-    .sm-proc:first-child { border-left:none; }
-    .sm-proc-l { font-family:var(--mono,monospace); font-size:8.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.36)); }
-    .sm-proc-v { font-size:15px; font-weight:500; color:var(--fg-0,#DCE8FF); font-variant-numeric:tabular-nums; }
-    .sm-proc-sub { font-family:var(--mono,monospace); font-size:9px; color:var(--fg-3,rgba(220,232,255,.3)); }
   `;
 
   function injectStyle() {
@@ -172,19 +191,18 @@
   }
 
   /* ─── Construction du DOM ───────────────────────────────────────────────── */
-  function gaugeCard(id, label, withSpark) {
+  function gaugeCard(id, label) {
     return `<div class="sm-card sm-gauge" id="sm-panel-${id}">
-      <span class="sm-gauge-label">${label}</span>
+      <span class="sm-gauge-label sm-eyebrow">${label}</span>
       <div class="sm-ringwrap" id="sm-rw-${id}">
         <div class="sm-ringval"><span class="sm-ringpct"><span id="sm-v-${id}">0</span><span class="u">%</span></span></div>
       </div>
       <div class="sm-ringsub" id="sm-s-${id}">—</div>
-      ${withSpark ? `<canvas id="sm-spark-${id}" class="sm-spark"></canvas>` : ''}
     </div>`;
   }
 
   function buildDOM() {
-    // chrome
+    // chrome (langage commun aux 4 vues)
     const chrome = document.createElement('div');
     chrome.className = 'jx-chrome';
     chrome.innerHTML = `
@@ -200,10 +218,11 @@
     const content = document.createElement('div');
     content.className = 'sm-content';
     content.innerHTML = `
-      <div class="sm-grid">
-        ${gaugeCard('cpu', 'CPU', true)}
-        ${gaugeCard('ram', 'RAM', true)}
-        ${gaugeCard('disk', 'DISQUE', false)}
+      <!-- Palier 1 : jauges + cerveau -->
+      <div class="sm-top">
+        ${gaugeCard('cpu', 'CPU')}
+        ${gaugeCard('ram', 'RAM')}
+        ${gaugeCard('disk', 'DISQUE')}
         <div class="sm-card sm-brain" id="sm-panel-llm">
           <span class="sm-eyebrow">Cerveau Jarvis · provider actif</span>
           <div class="sm-brain-row">
@@ -216,17 +235,53 @@
           <div id="sm-llm-routes"><div class="sm-route"><span class="sm-route-k">—</span></div></div>
         </div>
       </div>
-      <div class="sm-bot">
-        <div class="sm-services" id="sm-panel-missions">
-          <div class="sm-svc"><span class="sm-svc-l">Moteur proactif</span><span class="sm-svc-v" id="sm-svc-proactive">—</span></div>
-          <div class="sm-svc"><span class="sm-svc-l">Missions</span><span class="sm-svc-v" id="sm-svc-missions">—</span><span class="sm-svc-sub" id="sm-svc-missions-sub"></span></div>
-          <div class="sm-svc"><span class="sm-svc-l">Mémoire</span><span class="sm-svc-v" id="sm-svc-mem">—</span><span class="sm-svc-sub" id="sm-svc-mem-sub"></span></div>
-          <div class="sm-svc"><span class="sm-svc-l">Sessions</span><span class="sm-svc-v" id="sm-svc-sessions">—</span></div>
-          <div class="sm-svc" id="sm-bat-cell" style="display:none"><span class="sm-svc-l">Batterie</span><span class="sm-svc-v" id="sm-svc-bat">—</span><div class="sm-bat-bg"><div class="sm-bat-fg" id="sm-bat-bar"></div></div></div>
+
+      <!-- Palier 2 : services + missions (remplit le milieu) -->
+      <div class="sm-mid">
+        <div class="sm-card sm-panel" id="sm-panel-services">
+          <span class="sm-eyebrow">Services · écosystème Jarvis</span>
+          <div class="sm-rows">
+            <div class="sm-row"><div class="sm-row-name">Backend API<span class="sub">noyau</span></div><span class="jx-badge green" id="sm-svc-api"><span class="dot"></span>Online</span></div>
+            <div class="sm-row"><div class="sm-row-name">Moteur proactif<span class="sub">missions auto</span></div><span class="jx-badge" id="sm-svc-proactive-badge"><span class="dot"></span><span id="sm-svc-proactive">—</span></span></div>
+            <div class="sm-row"><div class="sm-row-name">Mémoire<span class="sub" id="sm-svc-mem-sub">—</span></div><span class="sm-row-v" id="sm-svc-mem">—</span></div>
+            <div class="sm-row"><div class="sm-row-name">Sessions<span class="sub">historique</span></div><span class="sm-row-v" id="sm-svc-sessions">—</span></div>
+            <div class="sm-row" id="sm-bat-cell" style="display:none"><div class="sm-row-name">Batterie<span class="sub">alimentation</span></div><span class="sm-row-v"><span id="sm-svc-bat">—</span><span class="sm-bat-bg"><span class="sm-bat-fg" id="sm-bat-bar"></span></span></span></div>
+          </div>
         </div>
-        <div class="sm-process">
-          <div class="sm-proc"><span class="sm-proc-l">Processus Jarvis</span><span class="sm-proc-v" id="sm-proc-cpu">—</span><span class="sm-proc-sub">CPU</span></div>
-          <div class="sm-proc"><span class="sm-proc-l">&nbsp;</span><span class="sm-proc-v" id="sm-proc-ram">—</span><span class="sm-proc-sub">RAM</span></div>
+        <div class="sm-card sm-panel" id="sm-panel-missions">
+          <span class="sm-eyebrow">Missions · pilotage</span>
+          <div class="sm-mis-hero">
+            <span class="sm-mis-num" id="sm-mis-running">0</span>
+            <span class="sm-mis-lbl">en cours</span>
+          </div>
+          <div class="sm-mis-track"><div class="sm-mis-fill" id="sm-mis-fill"></div></div>
+          <div class="sm-mis-stats">
+            <div class="sm-mis-stat"><div class="k">Terminées</div><div class="v" id="sm-mis-done">—</div></div>
+            <div class="sm-mis-stat"><div class="k">Total</div><div class="v" id="sm-mis-total">—</div></div>
+            <div class="sm-mis-stat"><div class="k">File</div><div class="v" id="sm-mis-queue">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Palier 3 : bandeau bas (sparklines + valeurs) -->
+      <div class="sm-bot">
+        <div class="sm-card sm-cell">
+          <span class="sm-cell-l">CPU · 60 s</span>
+          <canvas id="sm-spark-cpu" class="sm-spark"></canvas>
+        </div>
+        <div class="sm-card sm-cell">
+          <span class="sm-cell-l">RAM · 60 s</span>
+          <canvas id="sm-spark-ram" class="sm-spark"></canvas>
+        </div>
+        <div class="sm-card sm-cell">
+          <span class="sm-cell-l">Uptime</span>
+          <span class="sm-cell-v" id="sm-cell-uptime">—</span>
+          <span class="sm-cell-sub">sans incident</span>
+        </div>
+        <div class="sm-card sm-cell">
+          <span class="sm-cell-l">Processus Jarvis</span>
+          <span class="sm-cell-v"><span id="sm-proc-cpu">—</span></span>
+          <span class="sm-cell-sub"><span id="sm-proc-ram">—</span> · RAM</span>
         </div>
       </div>`;
 
@@ -271,7 +326,10 @@
     const du = d.disk_used_gb ?? d.disk_used, dt = d.disk_total_gb ?? d.disk_total;
     if (du != null && dt != null) setText('sm-s-disk', `${Number(du).toFixed(0)} / ${Number(dt).toFixed(0)} Go`);
 
-    if (d.uptime_s != null) setText('sm-uptime', `UPTIME ${fmtUptime(d.uptime_s)}`);
+    if (d.uptime_s != null) {
+      setText('sm-uptime', `UPTIME ${fmtUptime(d.uptime_s)}`);
+      setText('sm-cell-uptime', fmtUptime(d.uptime_s));
+    }
 
     const proc = Array.isArray(d.proc) ? d.proc[0] : d.proc;
     if (proc) {
@@ -300,8 +358,14 @@
     if (!d) return;
     const p = d.projects;
     if (p) {
-      setText('sm-svc-missions', `${p.running ?? 0}`);
-      if (p.total != null) setText('sm-svc-missions-sub', `${p.done ?? 0} terminées / ${p.total} total`);
+      const running = p.running ?? 0, done = p.done ?? 0, total = p.total ?? 0;
+      const queue = Math.max(0, total - done - running);
+      setText('sm-mis-running', running);
+      setText('sm-mis-done', done);
+      setText('sm-mis-total', total);
+      setText('sm-mis-queue', queue);
+      const fill = document.getElementById('sm-mis-fill');
+      if (fill) fill.style.width = (total > 0 ? Math.round((done / total) * 100) : 0) + '%';
     }
     const m = d.memory;
     if (m) {
@@ -314,10 +378,12 @@
 
   function updateProactive(d) {
     if (!d) return;
-    const el = document.getElementById('sm-svc-proactive'); if (!el) return;
+    const badge = document.getElementById('sm-svc-proactive-badge');
+    const txt = document.getElementById('sm-svc-proactive');
+    if (!badge || !txt) return;
     const active = d.running ?? d.enabled ?? d.active ?? (d.status === 'running');
-    el.textContent = active ? 'Actif' : 'Inactif';
-    el.className = 'sm-svc-v ' + (active ? 'green' : 'off');
+    txt.textContent = active ? 'Actif' : 'Inactif';
+    badge.className = 'jx-badge ' + (active ? 'green' : '');
   }
 
   function updateLLM(d) {
@@ -363,13 +429,13 @@
   function stopClock() { clearInterval(clockTimer); clockTimer = null; }
 
   /* ─── Focus métrique ────────────────────────────────────────────────────── */
-  const FOCUS_MAP = { cpu: 'sm-panel-cpu', ram: 'sm-panel-ram', disk: 'sm-panel-disk', llm: 'sm-panel-llm', missions: 'sm-panel-missions' };
+  const FOCUS_MAP = { cpu: 'sm-panel-cpu', ram: 'sm-panel-ram', disk: 'sm-panel-disk', disque: 'sm-panel-disk', llm: 'sm-panel-llm', cerveau: 'sm-panel-llm', services: 'sm-panel-services', missions: 'sm-panel-missions' };
   function setFocus(metric) {
     document.querySelectorAll('.sm-focused').forEach((el) => { el.classList.remove('sm-focused'); el.style.transform = ''; });
     if (!metric) return;
     const id = FOCUS_MAP[String(metric).toLowerCase()]; if (!id) return;
     const panel = document.getElementById(id);
-    if (panel) { panel.classList.add('sm-focused'); if (panel.classList.contains('sm-gauge')) panel.style.transform = 'scale(1.03)'; }
+    if (panel) { panel.classList.add('sm-focused'); if (panel.classList.contains('sm-gauge')) panel.style.transform = 'scale(1.04)'; }
   }
 
   /* ─── Container ─────────────────────────────────────────────────────────── */
