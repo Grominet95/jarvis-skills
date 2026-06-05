@@ -5,6 +5,7 @@ version: 2.0.0
 author: Grominet95
 description: "Cockpit système temps réel — jauges CPU/RAM/disque, cerveau LLM, services, missions"
 tags: [système, monitoring, dashboard, performance]
+glyph: SYS
 commands:
   - action: show
     description: Affiche le cockpit système en plein écran
