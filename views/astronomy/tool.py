@@ -7,20 +7,47 @@ from tools.base import Tool, ToolResult
 class AstronomyViewTool(Tool):
     name = "astronomy_view"
     description = """
-    Affiche et contrôle la carte du ciel (constellations) en plein écran.
+    Affiche et contrôle le ciel étoilé temps réel en plein écran.
+    Catalogue HYG ~5000 étoiles réelles, constellations IAU, Voie lactée,
+    planètes (Mercure, Vénus, Mars, Jupiter, Saturne), galaxies (M31, M33,
+    M51, M81), nébuleuses (M42 Orion, Flamme), amas (M45 Pléiades, M13).
 
-    Utiliser quand l'utilisateur veut :
-    - Voir le ciel / les étoiles ("affiche-moi le ciel", "montre les étoiles")
-    - Visualiser une constellation ("montre Orion", "où est la Grande Ourse ?")
-    - Explorer les constellations, les astres, la voûte céleste
+    >>> UTILISER CET OUTIL EN PRIORITÉ <<< pour TOUTE demande qui mentionne
+    un objet astronomique : étoile, constellation, planète, galaxie,
+    nébuleuse, amas, Voie lactée, ciel nocturne. NE PAS chercher sur le
+    web ni en cartographie pour des noms qui peuvent désigner un lieu
+    homonyme — "Grande Ourse", "Vénus", "Mars", "Orion", "Pégase", etc.
+    sont des références CÉLESTES dans le contexte de Jarvis.
+
+    Exemples d'usage :
+    - "Montre-moi la Grande Ourse" → focus_constellation(constellation="Grande Ourse")
+    - "Affiche Vénus" / "Où est Vénus ?" → focus_planet(planet="Vénus")
+    - "Montre Mars" → focus_planet(planet="Mars")
+    - "Affiche Andromède" / "Montre M31" → focus_object(object="M31")
+    - "Carte du ciel" / "Affiche les étoiles" → show
+    - "Cache le ciel" → hide
 
     Actions disponibles :
-    - show                : affiche la carte du ciel (vue d'ensemble)
+    - show                : affiche le ciel temps réel (Paris par défaut)
     - hide                : masque la vue
-    - overview            : revient à la vue d'ensemble (retire le focus)
-    - focus_constellation : met une constellation au point
+    - overview            : retire le focus, dézoom au champ large
+    - focus_constellation : centre + zoom + panneau d'infos sur une constellation
                             (params: constellation — "Orion", "Cassiopée",
-                             "Grande Ourse", "Cygne")
+                             "Grande Ourse", "Cygne", "Scorpion", "Lion",
+                             "Andromède", "Persée", "Lyre", "Taureau",
+                             "Gémeaux", "Bouvier", "Aigle", "Pégase",
+                             "Petite Ourse")
+    - focus_planet        : centre + zoom + panneau d'infos sur une planète
+                            (params: planet — "Mercure", "Vénus", "Mars",
+                             "Jupiter", "Saturne")
+    - focus_object        : centre + zoom + panneau d'infos sur un objet du
+                            ciel profond
+                            (params: object — "M31", "Andromède", "M33",
+                             "M42", "Pléiades", "M45", "M13", "M51", "M81",
+                             "Nébuleuse Flamme")
+    - set_location        : change le lieu de l'observateur
+                            (params: lat — float, lon — float)
+    - zoom_in / zoom_out  : ajuste le champ de vision
     """
 
     def __init__(self, broadcast_event: Callable[[dict], None]) -> None:
@@ -35,10 +62,19 @@ class AstronomyViewTool(Tool):
             self._broadcast({"type": "hide_view", "view_id": "astronomy"})
             return ToolResult(content="Carte du ciel masquée.")
 
-        supported = {"overview", "focus_constellation"}
+        supported = {
+            "overview",
+            "focus_constellation",
+            "focus_planet",
+            "focus_object",
+            "focus_dso",
+            "set_location",
+            "zoom_in",
+            "zoom_out",
+        }
         if action not in supported:
             return ToolResult(
-                content=f"Action inconnue '{action}'. Supportées : show, hide, {', '.join(supported)}",
+                content=f"Action inconnue '{action}'. Supportées : show, hide, {', '.join(sorted(supported))}",
                 is_error=True,
             )
 
