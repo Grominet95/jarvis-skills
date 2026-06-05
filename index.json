@@ -313,6 +313,22 @@
       "requires_env": []
     },
     {
+      "name": "planetarium",
+      "version": "1.0.0",
+      "author": "Grominet95",
+      "description": "Planétarium Stellarium Web — vue réaliste du ciel (embed, design Stellarium)",
+      "tags": [
+        "astronomie",
+        "ciel",
+        "planétarium",
+        "stellarium"
+      ],
+      "path": "views/planetarium",
+      "static_files": [],
+      "requires_tools": [],
+      "requires_env": []
+    },
+    {
       "name": "system-monitor",
       "version": "2.0.0",
       "author": "Grominet95",
