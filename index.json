@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "updated_at": "2026-06-02",
+  "updated_at": "2026-06-05",
   "skills": [
     {
       "name": "bambulab-printer",
@@ -262,14 +262,15 @@
   "views": [
     {
       "name": "astronomy",
-      "version": "2.0.0",
+      "version": "3.0.0",
       "author": "Grominet95",
-      "description": "Voûte céleste immersive — constellations qui s'illuminent au focus, faits stellaires",
+      "description": "Vrai ciel temps réel — HYG 5000 étoiles, constellations IAU, Voie lactée, DSO, planètes, navigation pan/zoom",
       "tags": [
         "astronomie",
         "ciel",
-        "constellations",
-        "étoiles"
+        "étoiles",
+        "planètes",
+        "constellations"
       ],
       "path": "views/astronomy",
       "static_files": [],
