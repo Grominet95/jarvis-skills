@@ -1,13 +1,11 @@
 /**
  * Vue Planétarium — jarvis-skills
- * Stellarium Web embed via iframe avec masquage Jarvis :
- *   • iframe décalée vers le haut pour cacher la barre de recherche
- *     (et remonter la barre de boutons du bas)
- *   • dégradé sombre à gauche pour masquer la pub "Stellarium Mobile"
- *   • dégradé sombre en bas-gauche pour masquer le bandeau cookies
- *   • chrome Jarvis (label haut-gauche + hint bas-centre) en superposition
+ * Stellarium Web embed via iframe avec décalage agressif pour cacher
+ * la barre de recherche (haut), le promo "Stellarium Mobile" (gauche)
+ * et le bandeau cookies (bas-gauche). L'iframe est élargie et décalée
+ * pour pousser tous ces éléments hors-écran.
  *
- * Dépend de : _shared.js. Pas de chrome partagé — Stellarium occupe tout.
+ * Dépend de : _shared.js.
  */
 (function () {
   if (!window.Jarvis?.views) return;
@@ -16,12 +14,10 @@
   const STYLE_ID = 'planetarium-css';
   const STELLARIUM_URL = 'https://stellarium-web.org/';
 
-  /* Hauteurs/largeurs des éléments Stellarium à masquer (ajuster ici) */
-  const TOP_OFFSET = 56;       // décalage vers le haut de l'iframe (cache la barre)
-  const SIDEBAR_W = 300;       // largeur masque gauche (pub Stellarium Mobile)
-  const COOKIE_W = 460;        // largeur masque bandeau cookies bas-gauche
-  const COOKIE_H = 70;
-  const BOTTOM_BAR_H = 36;     // bande Jarvis au pied (au-dessus des boutons remontés)
+  /* Décalages — à ajuster si Stellarium change sa mise en page */
+  const TOP_OFFSET = 64;       // shift vers le haut (cache la barre de recherche)
+  const LEFT_OFFSET = 320;     // shift vers la gauche (cache pub + cookies)
+  const BOTTOM_BAR_H = 32;     // hauteur du hint Jarvis en bas
 
   let container = null, iframe = null, overlay = null, _visible = false;
 
@@ -32,37 +28,31 @@
     s.id = STYLE_ID;
     s.textContent = `
       #planetarium-container { background:#020407; overflow:hidden; }
-      #planetarium-container iframe { position:absolute; left:0; width:100%; border:none; display:block; }
+      #planetarium-container iframe { position:absolute; border:none; display:block; }
 
-      /* Overlay : aucun pointer-events sauf sur les masques explicites */
+      /* Chrome Jarvis (au-dessus de l'iframe, sans capter les clics sauf le voile latéral) */
       #planetarium-container .pla-ov { position:absolute; inset:0; z-index:10; pointer-events:none; font-family:var(--sans,"Geist",system-ui,sans-serif); }
-      #planetarium-container .pla-ov .mask { position:absolute; pointer-events:auto; }
 
-      /* Top : dégradé sombre vers le haut, lisse le décalage de l'iframe */
-      #planetarium-container .pla-mask-top { top:0; left:0; right:0; height:${TOP_OFFSET}px;
-        background: linear-gradient(180deg, rgba(2,4,7,.95) 0%, rgba(2,4,7,.55) 70%, transparent 100%); }
+      /* Voile gauche : un dégradé très court contre le bord, juste pour la transition */
+      #planetarium-container .pla-fade-left { position:absolute; top:0; left:0; bottom:0; width:90px; pointer-events:none;
+        background: linear-gradient(90deg, rgba(2,4,7,.85) 0%, rgba(2,4,7,.35) 50%, transparent 100%); }
 
-      /* Gauche : couvre la pub Stellarium Mobile */
-      #planetarium-container .pla-mask-left { top:0; left:0; width:${SIDEBAR_W}px; bottom:0;
-        background: linear-gradient(90deg, rgba(2,4,7,.94) 0%, rgba(2,4,7,.86) 55%, rgba(2,4,7,.4) 85%, transparent 100%); }
+      /* Voile haut : court fade au-dessus */
+      #planetarium-container .pla-fade-top { position:absolute; top:0; left:0; right:0; height:40px; pointer-events:none;
+        background: linear-gradient(180deg, rgba(2,4,7,.7) 0%, transparent 100%); }
 
-      /* Cookies en bas-gauche */
-      #planetarium-container .pla-mask-cookie { bottom:0; left:0; width:${COOKIE_W}px; height:${COOKIE_H}px;
-        background: linear-gradient(0deg, rgba(2,4,7,.96) 0%, rgba(2,4,7,.7) 60%, transparent 100%); }
-
-      /* Bande Jarvis au pied — au-dessus des boutons remontés */
+      /* Bande Jarvis au pied avec hint */
       #planetarium-container .pla-bottom { position:absolute; left:0; right:0; bottom:0; height:${BOTTOM_BAR_H}px;
-        background: linear-gradient(0deg, rgba(2,4,7,.92) 0%, transparent 100%); pointer-events:none;
+        background: linear-gradient(0deg, rgba(2,4,7,.85) 0%, transparent 100%); pointer-events:none;
         display:flex; align-items:center; justify-content:center; }
 
-      /* Tag Jarvis (haut-gauche, par-dessus le masque gauche) */
-      #planetarium-container .pla-tag { position:absolute; top:24px; left:28px; z-index:11;
+      /* Tag Jarvis (haut-gauche) */
+      #planetarium-container .pla-tag { position:absolute; top:24px; left:28px; z-index:11; pointer-events:none;
         font-family:var(--mono,monospace); font-size:9.5px; letter-spacing:.18em; text-transform:uppercase;
-        color:var(--fg-2,rgba(220,232,255,.6)); pointer-events:none; }
+        color:var(--fg-2,rgba(220,232,255,.6)); }
       #planetarium-container .pla-tag b { display:block; font-family:var(--display-mark,"Landasans",var(--serif));
         font-weight:500; font-size:13px; letter-spacing:.22em; color:var(--fg-0,#DCE8FF); margin-top:6px; }
 
-      /* Hint bas-centre */
       #planetarium-container .pla-hint { font-family:var(--mono,monospace); font-size:10px; letter-spacing:.16em;
         text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.5)); pointer-events:none; }
 
@@ -82,18 +72,20 @@
       transition: 'opacity .4s ease', display: 'none',
     });
 
-    // Écran de chargement
     const loading = document.createElement('div');
     loading.className = 'pla-loading';
     loading.textContent = 'Chargement Stellarium Web…';
     container.appendChild(loading);
 
-    // Iframe Stellarium : décalée vers le haut + étirée de la même valeur
-    // → masque la barre de recherche, remonte la barre de boutons du bas
+    /* Iframe : décalée -top + -left, élargie de la même valeur dans chaque axe
+       → barre de recherche (haut), pub Stellarium Mobile (gauche) et bandeau
+         cookies (bas-gauche) sortent du viewport. */
     iframe = document.createElement('iframe');
     iframe.src = STELLARIUM_URL;
     iframe.setAttribute('allow', 'fullscreen; geolocation');
     iframe.style.top = `-${TOP_OFFSET}px`;
+    iframe.style.left = `-${LEFT_OFFSET}px`;
+    iframe.style.width = `calc(100% + ${LEFT_OFFSET}px)`;
     iframe.style.height = `calc(100% + ${TOP_OFFSET}px)`;
     iframe.addEventListener('load', () => {
       loading.classList.add('gone');
@@ -101,13 +93,11 @@
     });
     container.appendChild(iframe);
 
-    // Overlay Jarvis
     overlay = document.createElement('div');
     overlay.className = 'pla-ov';
     overlay.innerHTML = `
-      <div class="mask pla-mask-top"></div>
-      <div class="mask pla-mask-left"></div>
-      <div class="mask pla-mask-cookie"></div>
+      <div class="pla-fade-top"></div>
+      <div class="pla-fade-left"></div>
       <div class="pla-bottom"><span class="pla-hint">souris pour explorer · molette pour zoomer · cliquer un astre</span></div>
       <div class="pla-tag">Planétarium<b>Jarvis · Stellarium</b></div>
     `;
