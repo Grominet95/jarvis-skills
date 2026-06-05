@@ -1,17 +1,21 @@
 /**
  * Vue Planétarium — jarvis-skills
- * Stellarium Web embed via iframe avec masques opaques :
- *   • Masque haut complet : cache la barre de recherche ET le hamburger
- *     (pour empêcher l'ouverture des panneaux Stellarium qui cassent la
- *     mise en page en flexbox).
- *   • Masque latéral gauche centré : cache le promo "Stellarium Mobile".
- *   • Bandeau bas opaque : cache le bandeau cookies, remonte la barre de
- *     boutons Stellarium (iframe raccourcie).
+ * Stellarium Web embed via iframe. Domaine externe (cross-origin), donc
+ * impossible de modifier le DOM Stellarium depuis ici. On le masque avec
+ * des panneaux opaques solides (pas de dégradés) pour avoir des bords nets.
  *
- * Limite assumée : quand on clique sur un astre, Stellarium ouvre son
- * panneau d'infos au top-left ; l'en-tête (titre + bouton fermer) est
- * caché par notre masque haut. Le corps reste lisible. Clic ailleurs
- * pour fermer.
+ *   • Top bar opaque (56px) : cache la barre de recherche + hamburger
+ *     (le hamburger doit être caché sinon son clic casse la mise en page).
+ *   • Panneau latéral gauche opaque (vertical-center) : cache le promo
+ *     "Stellarium Mobile". Démarre sous le top bar, laisse les 300 px du
+ *     haut libres pour le panneau d'infos quand on clique un astre.
+ *   • Bandeau bas opaque (130px) : cache le bandeau cookies, accueille le
+ *     hint. L'iframe est raccourcie pour faire remonter les boutons.
+ *
+ * Pour aller plus loin (vraiment supprimer les éléments Stellarium au
+ * lieu de les masquer) il faudrait self-host Stellarium Web ou utiliser
+ * Stellarium Web Engine (wasm) directement. Les deux exigent du travail
+ * backend.
  *
  * Dépend de : _shared.js.
  */
@@ -22,14 +26,13 @@
   const STYLE_ID = 'planetarium-css';
   const STELLARIUM_URL = 'https://stellarium-web.org/';
 
-  /* Dimensions des masques — ajuster ici si Stellarium change sa mise en page */
-  const BOTTOM_RESERVE = 70;       // l'iframe s'arrête à 70 px du bas
-  const BOTTOM_CHROME_H = 150;     // bandeau Jarvis bas (solide, cache cookies)
-  const BOTTOM_FADE_H = 28;        // fondu au-dessus du bandeau pour la transition douce
-  const TOP_MASK_H = 56;           // hauteur du masque haut (solide, cache top bar Stellarium)
-  const PROMO_W = 320;             // largeur du masque latéral gauche
-  const PROMO_TOP_PCT = 22;        // % depuis le haut où commence le masque promo
-  const PROMO_BOTTOM_PCT = 26;     // % depuis le bas où s'arrête le masque promo
+  /* Dimensions des panneaux opaques — ajuster ici */
+  const TOP_BAR_H = 56;          // cache la barre de recherche + hamburger
+  const BOTTOM_RESERVE = 70;     // iframe raccourcie de cette valeur au pied
+  const BOTTOM_CHROME_H = 130;   // bandeau bas opaque (cache cookies)
+  const PROMO_TOP = 300;         // y où commence le panneau latéral gauche
+  const PROMO_H = 520;           // hauteur du panneau latéral gauche
+  const PROMO_W = 280;           // largeur du panneau latéral gauche
 
   let container = null, iframe = null, overlay = null, _visible = false;
 
@@ -43,41 +46,26 @@
       #planetarium-container iframe { position:absolute; border:none; display:block; }
 
       #planetarium-container .pla-ov { position:absolute; inset:0; z-index:10; pointer-events:none; font-family:var(--sans,"Geist",system-ui,sans-serif); }
-      #planetarium-container .pla-ov .mask { position:absolute; pointer-events:auto; background:#020407; }
-      #planetarium-container .pla-ov .fade { position:absolute; pointer-events:none; }
 
-      /* Masque haut complet : cache la barre de recherche, le hamburger et OBSERVE
-         (empêche l'ouverture des panneaux Stellarium qui cassent la mise en page) */
-      #planetarium-container .pla-mask-top { top:0; left:0; right:0; height:${TOP_MASK_H}px; }
-      #planetarium-container .pla-fade-top { top:${TOP_MASK_H}px; left:0; right:0; height:24px;
-        background: linear-gradient(180deg, #020407 0%, transparent 100%); }
+      /* Panneaux opaques, fond solide, pas de dégradés */
+      #planetarium-container .pla-top { position:absolute; top:0; left:0; right:0; height:${TOP_BAR_H}px;
+        background:#020407; pointer-events:auto;
+        display:flex; align-items:center; justify-content:space-between; padding:0 24px; }
+      #planetarium-container .pla-promo { position:absolute; top:${PROMO_TOP}px; left:0; width:${PROMO_W}px; height:${PROMO_H}px;
+        background:#020407; pointer-events:auto; }
+      #planetarium-container .pla-bottom { position:absolute; bottom:0; left:0; right:0; height:${BOTTOM_CHROME_H}px;
+        background:#020407; pointer-events:auto;
+        display:flex; align-items:flex-end; justify-content:center; padding-bottom:18px; }
 
-      /* Masque latéral gauche centré : cache le promo Stellarium Mobile */
-      #planetarium-container .pla-mask-promo { top:${PROMO_TOP_PCT}%; bottom:${PROMO_BOTTOM_PCT}%; left:0; width:${PROMO_W}px; }
-      #planetarium-container .pla-fade-promo { top:${PROMO_TOP_PCT}%; bottom:${PROMO_BOTTOM_PCT}%; left:${PROMO_W}px; width:60px;
-        background: linear-gradient(90deg, #020407 0%, transparent 100%); }
-
-      /* Bandeau bas opaque + fondu au-dessus */
-      #planetarium-container .pla-chrome-bottom { position:absolute; left:0; right:0; bottom:0; height:${BOTTOM_CHROME_H}px;
-        background: #020407; pointer-events:auto;
-        display:flex; align-items:flex-end; justify-content:center; padding-bottom:20px; }
-      #planetarium-container .pla-fade-bottom { left:0; right:0; bottom:${BOTTOM_CHROME_H}px; height:${BOTTOM_FADE_H}px;
-        background: linear-gradient(0deg, #020407 0%, transparent 100%); }
-
-      /* Tag Jarvis (top-right au-dessus du masque haut) */
-      #planetarium-container .pla-tag { position:absolute; top:14px; right:24px; z-index:11; pointer-events:none;
-        font-family:var(--mono,monospace); font-size:9.5px; letter-spacing:.18em; text-transform:uppercase;
-        color:var(--fg-2,rgba(220,232,255,.6)); text-align:right; }
-      #planetarium-container .pla-tag b { display:block; font-family:var(--display-mark,"Landasans",var(--serif));
-        font-weight:500; font-size:12px; letter-spacing:.22em; color:var(--fg-0,#DCE8FF); margin-top:3px; }
-
-      /* Tag haut-gauche en miniature (juste pour identifier la vue) */
-      #planetarium-container .pla-corner { position:absolute; top:18px; left:24px; z-index:11; pointer-events:none;
-        font-family:var(--mono,monospace); font-size:9.5px; letter-spacing:.18em; text-transform:uppercase;
-        color:var(--fg-3,rgba(220,232,255,.45)); }
-
-      #planetarium-container .pla-hint { font-family:var(--mono,monospace); font-size:10px; letter-spacing:.16em;
-        text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.5)); pointer-events:none; }
+      /* Textes Jarvis dans les panneaux */
+      #planetarium-container .pla-brand { font-family:var(--display-mark,"Landasans",var(--serif));
+        font-weight:500; font-size:13px; letter-spacing:.22em; color:var(--fg-0,#DCE8FF); }
+      #planetarium-container .pla-brand small { font-family:var(--mono,monospace); font-weight:400;
+        font-size:9.5px; letter-spacing:.18em; color:var(--fg-3,rgba(220,232,255,.45)); margin-right:10px; }
+      #planetarium-container .pla-right { font-family:var(--mono,monospace); font-size:9.5px;
+        letter-spacing:.18em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.5)); }
+      #planetarium-container .pla-hint { font-family:var(--mono,monospace); font-size:10px;
+        letter-spacing:.16em; text-transform:uppercase; color:var(--fg-3,rgba(220,232,255,.5)); }
 
       /* Loading */
       #planetarium-container .pla-loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
@@ -116,14 +104,14 @@
     overlay = document.createElement('div');
     overlay.className = 'pla-ov';
     overlay.innerHTML = `
-      <div class="mask pla-mask-top"></div>
-      <div class="fade pla-fade-top"></div>
-      <div class="mask pla-mask-promo"></div>
-      <div class="fade pla-fade-promo"></div>
-      <div class="fade pla-fade-bottom"></div>
-      <div class="pla-chrome-bottom"><span class="pla-hint">souris pour explorer · molette pour zoomer · cliquer un astre</span></div>
-      <div class="pla-corner">Planétarium</div>
-      <div class="pla-tag">Jarvis<b>Stellarium</b></div>
+      <div class="pla-top">
+        <span class="pla-brand"><small>PLANÉTARIUM ·</small>JARVIS</span>
+        <span class="pla-right">STELLARIUM WEB</span>
+      </div>
+      <div class="pla-promo"></div>
+      <div class="pla-bottom">
+        <span class="pla-hint">souris pour explorer · molette pour zoomer · cliquer un astre</span>
+      </div>
     `;
     container.appendChild(overlay);
 
