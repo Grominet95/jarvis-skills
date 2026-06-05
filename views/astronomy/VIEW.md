@@ -1,22 +1,35 @@
 ---
 id: astronomy
 name: Carte du ciel
-version: 2.0.0
+version: 3.0.0
 author: Grominet95
-description: "Voûte céleste immersive — constellations qui s'illuminent au focus, faits stellaires"
-tags: [astronomie, ciel, constellations, étoiles]
+description: "Vrai ciel temps réel — HYG 5000 étoiles, constellations IAU, Voie lactée, DSO, planètes, navigation pan/zoom"
+tags: [astronomie, ciel, étoiles, planètes, constellations]
 glyph: SKY
 commands:
   - action: show
-    description: Affiche la carte du ciel en plein écran (vue d'ensemble, constellations tracées faiblement)
+    description: Affiche le vrai ciel (Paris, heure courante)
   - action: hide
     description: Masque la vue
   - action: overview
-    description: Revient à la vue d'ensemble du ciel (dézoom, retire le focus)
+    description: Réinitialise la vue (plein Sud, alt 45°, FOV 90°)
   - action: focus_constellation
-    description: Met une constellation au point — le reste du ciel s'assombrit, ses lignes s'illuminent, son nom s'écrit en grand
+    description: Centre sur une constellation
     params:
-      constellation: string   # "Orion", "Cassiopée", "Grande Ourse", "Cygne"
+      constellation: string   # "Orion", "Cassiopée", "Grande Ourse", "Cygne", "Scorpion", "Lion"
+  - action: focus_planet
+    description: Centre sur une planète
+    params:
+      planet: string   # "Mars", "Jupiter", "Saturne", "Vénus", "Mercure"
+  - action: set_location
+    description: Change le lieu de l'observateur
+    params:
+      lat: float
+      lon: float
+  - action: zoom_in
+    description: Réduit le champ (zoom avant)
+  - action: zoom_out
+    description: Élargit le champ (zoom arrière)
 ---
 
 # Carte du ciel — vue Jarvis
