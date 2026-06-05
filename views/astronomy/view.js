@@ -282,13 +282,14 @@
   let container=null, canvas=null, ctx=null, animFrame=null, ro=null, chromeEl=null, infoEl=null;
   let _visible=false, W=0, H=0;
   let FRAME_TARGETS = [];
+  let HOVER = null;  // {kind, key, x, y} cible actuellement survolée
 
   function proj(alt, az) {
     if (alt < -8) return null;
     const laR=VIEW.lookAlt*D2R, lazR=VIEW.lookAz*D2R, aR=alt*D2R, zR=az*D2R;
     const dZ=zR-lazR;
     const cosC=Math.sin(laR)*Math.sin(aR)+Math.cos(laR)*Math.cos(aR)*Math.cos(dZ);
-    if (cosC < 0.001) return null;
+    if (cosC < 0.08) return null;
     const sc=(W/2)/Math.tan(VIEW.fov*0.5*D2R);
     return {
       x: W/2 + Math.cos(aR)*Math.sin(dZ)/cosC*sc,
@@ -375,17 +376,23 @@
 
     drawMilkyWay(L);
 
-    /* Constellations — lignes fines mais visibles */
+    /* Constellations — lignes fines, propres (filtres stricts) */
     ctx.save();
     ctx.strokeStyle = 'rgba(135,170,230,.42)';
     ctx.lineWidth = 0.75;
+    const Wmax = W * 0.45;  // distance max d'un segment à l'écran
+    const offScreen = Math.max(W, H) * 1.5;
     for (const seg of CLINES) {
       const r1=seg[0], d1=seg[1], r2=seg[2], d2=seg[3];
       const a1 = altaz(r1/100, d1/100, L, OBS.lat);
       const a2 = altaz(r2/100, d2/100, L, OBS.lat);
-      if (a1.alt < -5 && a2.alt < -5) continue;
+      if (a1.alt < 0 || a2.alt < 0) continue;  // au moins une partie sous l'horizon → on saute
       const p1 = proj(a1.alt, a1.az), p2 = proj(a2.alt, a2.az);
-      if (!p1 || !p2 || Math.hypot(p2.x-p1.x, p2.y-p1.y) > W * 0.6) continue;
+      if (!p1 || !p2) continue;
+      // Rejette si l'un des points est très loin hors écran (artefact près de la singularité)
+      if (Math.abs(p1.x - W/2) > offScreen || Math.abs(p1.y - H/2) > offScreen) continue;
+      if (Math.abs(p2.x - W/2) > offScreen || Math.abs(p2.y - H/2) > offScreen) continue;
+      if (Math.hypot(p2.x-p1.x, p2.y-p1.y) > Wmax) continue;
       ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
     }
     ctx.restore();
@@ -462,7 +469,7 @@
       FRAME_TARGETS.push({ kind:'const', key, name:c.name, ra:c.ra, dec:c.dec, x:p.x, y:p.y });
       if (SEL && SEL.kind === 'const' && SEL.key === key) {
         ctx.save();
-        ctx.strokeStyle = 'rgba(160,200,255,.75)';
+        ctx.strokeStyle = 'rgba(160,200,255,.78)';
         ctx.lineWidth = 1.4;
         for (const seg of CLINES) {
           const r1=seg[0]/100, d1=seg[1]/100, r2=seg[2]/100, d2=seg[3]/100;
@@ -471,6 +478,7 @@
           const limSq = (c.fov * 0.7) * (c.fov * 0.7);
           if (dr1*dr1 + dd1*dd1 > limSq && dr2*dr2 + dd2*dd2 > limSq) continue;
           const a1 = altaz(r1, d1, L, OBS.lat), a2 = altaz(r2, d2, L, OBS.lat);
+          if (a1.alt < 0 || a2.alt < 0) continue;
           const pp1 = proj(a1.alt, a1.az), pp2 = proj(a2.alt, a2.az);
           if (!pp1 || !pp2 || Math.hypot(pp2.x-pp1.x, pp2.y-pp1.y) > W * 0.5) continue;
           ctx.beginPath(); ctx.moveTo(pp1.x, pp1.y); ctx.lineTo(pp2.x, pp2.y); ctx.stroke();
@@ -493,6 +501,22 @@
         if (!p || p.x < 0 || p.x > W || p.y < 0 || p.y > H) continue;
         ctx.fillText(NAMED[idxStr], p.x + 7, p.y - 5);
       }
+    }
+
+    /* Indicateur de survol */
+    if (HOVER && !DRAG) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(180,210,255,.85)';
+      ctx.lineWidth = 1.2;
+      const radius = HOVER.kind === 'const' ? 32 : 14;
+      const pulse = 1 + Math.sin(now / 200) * 0.08;
+      ctx.beginPath(); ctx.arc(HOVER.x, HOVER.y, radius * pulse, 0, 6.2832); ctx.stroke();
+      // libellé court à côté du curseur
+      const lblTxt = HOVER.kind === 'const' ? HOVER.name : HOVER.kind === 'planet' ? HOVER.name : HOVER.name;
+      ctx.fillStyle = 'rgba(220,232,255,.92)';
+      ctx.font = '10.5px var(--mono,monospace)';
+      ctx.fillText(lblTxt, HOVER.x + radius + 6, HOVER.y - radius - 2);
+      ctx.restore();
     }
 
     /* Horizon */
@@ -540,7 +564,7 @@
     let best = null, bestD = 1e9;
     for (const t of FRAME_TARGETS) {
       const d = Math.hypot(t.x - sx, t.y - sy);
-      const limit = t.kind === 'planet' ? 28 : t.kind === 'dso' ? 22 : 70;
+      const limit = t.kind === 'planet' ? 32 : t.kind === 'dso' ? 26 : 110;
       if (d < limit && d < bestD) { bestD = d; best = t; }
     }
     return best;
@@ -619,6 +643,7 @@
     canvas.addEventListener('mousedown', (e) => {
       downX = e.clientX; downY = e.clientY; downT = Date.now();
       DRAG = { x0: e.clientX, y0: e.clientY, la0: VIEW.lookAlt, lz0: VIEW.lookAz };
+      HOVER = null;
     });
 
     window.addEventListener('mousemove', (e) => {
@@ -630,8 +655,9 @@
       } else if (canvas) {
         const rect = canvas.getBoundingClientRect();
         const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
-        if (sx < 0 || sy < 0 || sx > W || sy > H) return;
+        if (sx < 0 || sy < 0 || sx > W || sy > H) { HOVER = null; canvas.style.cursor = 'grab'; return; }
         const hit = hitTest(sx, sy);
+        HOVER = hit;
         canvas.style.cursor = hit ? 'pointer' : 'grab';
       }
     });
