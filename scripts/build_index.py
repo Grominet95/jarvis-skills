@@ -2,11 +2,12 @@
 """Génère index.json depuis les manifestes skill.yaml et VIEW.md.
 
 Source de vérité : les fichiers manifestes individuels (skills/*/skill.yaml,
-views/*/skill.yaml ou views/*/VIEW.md). index.json est une vue dérivée.
+views/*/skill.yaml ou views/*/VIEW.md). index.json est une vue dérivée —
+ne jamais l'éditer à la main.
 
 Usage :
-    python scripts/generate_index.py           # écriture
-    python scripts/generate_index.py --check   # compare sans écrire (CI)
+    python scripts/build_index.py           # écriture
+    python scripts/build_index.py --check   # compare sans écrire (CI)
 """
 
 from __future__ import annotations
@@ -26,21 +27,18 @@ SKILLS_DIR = ROOT / "skills"
 VIEWS_DIR = ROOT / "views"
 INDEX_PATH = ROOT / "index.json"
 
-# Format de l'index. À incrémenter si la structure des tableaux change.
 INDEX_FORMAT_VERSION = "2.0"
 
-# Même correctif YAML que dans validate_skills.py (scalaires non-quotés).
 _YAML_PLAIN_SCALAR_RE = re.compile(
     r'^([ \t]*[a-zA-Z_][a-zA-Z0-9_-]*[ \t]*:[ \t]+)([^"\'{|>\[\n][^\n]*)$',
     re.MULTILINE,
 )
 
 
-# ── Parsing YAML ───────────────────────────────────────────────────────────────
+# ── YAML helpers ───────────────────────────────────────────────────────────────
 
-def _yaml_repair_colons(content: str) -> str:
-    """Cite les scalaires YAML non-quotés contenant ': ' (limitation pyyaml)."""
-    def _quote_value(m: re.Match) -> str:
+def _yaml_repair(content: str) -> str:
+    def _quote(m: re.Match) -> str:
         prefix, value = m.group(1), m.group(2).rstrip()
         if ": " not in value:
             return m.group(0)
@@ -49,49 +47,39 @@ def _yaml_repair_colons(content: str) -> str:
             return m.group(0)
         escaped = stripped.replace("\\", "\\\\").replace('"', '\\"')
         return f'{prefix}"{escaped}"'
-
-    return _YAML_PLAIN_SCALAR_RE.sub(_quote_value, content)
+    return _YAML_PLAIN_SCALAR_RE.sub(_quote, content)
 
 
 def _load_yaml(path: Path) -> Optional[dict]:
-    """Charge un fichier YAML avec réparation des scalaires non-quotés."""
     try:
         content = path.read_text(encoding="utf-8")
-    except OSError:
-        return None
-    try:
-        data = yaml.safe_load(content)
-    except yaml.YAMLError:
         try:
-            data = yaml.safe_load(_yaml_repair_colons(content))
+            data = yaml.safe_load(content)
         except yaml.YAMLError:
-            return None
-    return data if isinstance(data, dict) else None
+            data = yaml.safe_load(_yaml_repair(content))
+        return data if isinstance(data, dict) else None
+    except (OSError, yaml.YAMLError):
+        return None
 
 
-def _load_view_md_frontmatter(view_md: Path) -> Optional[dict]:
-    """Extrait et charge le frontmatter YAML d'un VIEW.md."""
+def _load_view_frontmatter(view_md: Path) -> Optional[dict]:
     try:
         content = view_md.read_text(encoding="utf-8")
-    except OSError:
-        return None
-    parts = content.split("---")
-    if len(parts) < 3:
-        return None
-    try:
-        data = yaml.safe_load(parts[1])
-    except yaml.YAMLError:
-        try:
-            data = yaml.safe_load(_yaml_repair_colons(parts[1]))
-        except yaml.YAMLError:
+        parts = content.split("---")
+        if len(parts) < 3:
             return None
-    return data if isinstance(data, dict) else None
+        try:
+            data = yaml.safe_load(parts[1])
+        except yaml.YAMLError:
+            data = yaml.safe_load(_yaml_repair(parts[1]))
+        return data if isinstance(data, dict) else None
+    except (OSError, yaml.YAMLError):
+        return None
 
 
-# ── Normalisation des champs ───────────────────────────────────────────────────
+# ── Normalisation ──────────────────────────────────────────────────────────────
 
 def _norm_env(raw: Any) -> list[str]:
-    """Normalise requires_env vers une liste de noms de variables."""
     if not raw or not isinstance(raw, list):
         return []
     result = []
@@ -106,7 +94,6 @@ def _norm_env(raw: Any) -> list[str]:
 
 
 def _norm_apps(raw: Any) -> list[str]:
-    """Normalise requires_apps vers une liste de noms d'applications."""
     if not raw or not isinstance(raw, list):
         return []
     result = []
@@ -121,7 +108,6 @@ def _norm_apps(raw: Any) -> list[str]:
 
 
 def _lst(raw: Any) -> list:
-    """Retourne une liste vide si raw est None ou non-liste."""
     if not raw or not isinstance(raw, list):
         return []
     return list(raw)
@@ -130,7 +116,6 @@ def _lst(raw: Any) -> list:
 # ── Constructeurs d'entrées ────────────────────────────────────────────────────
 
 def _skill_entry(dirname: str, data: dict) -> dict:
-    """Construit l'entrée index pour un skill conversationnel."""
     return {
         "name": str(data.get("name", dirname)),
         "version": str(data.get("version", "")),
@@ -149,14 +134,12 @@ def _skill_entry(dirname: str, data: dict) -> dict:
 
 
 def _preset_entry(dirname: str, data: dict) -> dict:
-    """Construit l'entrée index pour un preset."""
     entry = _skill_entry(dirname, data)
     entry["triggers"] = _lst(data.get("triggers"))
     return entry
 
 
-def _view_entry(dirname: str, data: dict) -> dict:
-    """Construit l'entrée index pour une vue (depuis skill.yaml ou VIEW.md)."""
+def _view_entry_from_yaml(dirname: str, data: dict) -> dict:
     return {
         "name": str(data.get("name", dirname)),
         "version": str(data.get("version", "")),
@@ -170,8 +153,7 @@ def _view_entry(dirname: str, data: dict) -> dict:
     }
 
 
-def _view_from_frontmatter(dirname: str, fm: dict) -> dict:
-    """Construit l'entrée index depuis le frontmatter VIEW.md (champs différents)."""
+def _view_entry_from_frontmatter(dirname: str, fm: dict) -> dict:
     return {
         "name": str(fm.get("id", dirname)),
         "version": str(fm.get("version", "")),
@@ -188,12 +170,10 @@ def _view_from_frontmatter(dirname: str, fm: dict) -> dict:
 # ── Génération ─────────────────────────────────────────────────────────────────
 
 def generate() -> dict:
-    """Génère le contenu complet de index.json depuis les manifestes."""
     skills: list[dict] = []
     presets: list[dict] = []
     views: list[dict] = []
 
-    # — Skills et presets depuis skills/*/skill.yaml
     if SKILLS_DIR.exists():
         for skill_dir in sorted(d for d in SKILLS_DIR.iterdir() if d.is_dir()):
             yaml_path = skill_dir / "skill.yaml"
@@ -208,24 +188,25 @@ def generate() -> dict:
             elif skill_type == "conversational":
                 skills.append(_skill_entry(skill_dir.name, data))
 
-    # — Vues depuis views/*/skill.yaml (priorité) ou VIEW.md (repli)
     if VIEWS_DIR.exists():
         for view_dir in sorted(
             d for d in VIEWS_DIR.iterdir()
             if d.is_dir() and d.name != "TEMPLATE"
         ):
+            # Priorité VIEW.md → frontmatter officiel
+            view_md = view_dir / "VIEW.md"
+            if view_md.exists():
+                fm = _load_view_frontmatter(view_md)
+                if fm:
+                    views.append(_view_entry_from_frontmatter(view_dir.name, fm))
+                    continue
+
+            # Fallback skill.yaml (type: view)
             yaml_path = view_dir / "skill.yaml"
             if yaml_path.exists():
                 data = _load_yaml(yaml_path)
                 if data and "name" in data:
-                    views.append(_view_entry(view_dir.name, data))
-                    continue
-
-            view_md = view_dir / "VIEW.md"
-            if view_md.exists():
-                fm = _load_view_md_frontmatter(view_md)
-                if fm:
-                    views.append(_view_from_frontmatter(view_dir.name, fm))
+                    views.append(_view_entry_from_yaml(view_dir.name, data))
 
     return {
         "version": INDEX_FORMAT_VERSION,
@@ -238,21 +219,14 @@ def generate() -> dict:
 
 # ── Mode --check ───────────────────────────────────────────────────────────────
 
-def _sort_by_name(entries: list[dict]) -> list[dict]:
-    """Trie une liste d'entrées index par name."""
+def _sort(entries: list[dict]) -> list[dict]:
     return sorted(entries, key=lambda e: e.get("name", ""))
 
 
 def check() -> bool:
-    """Vérifie que index.json est synchronisé avec les manifestes.
-
-    Compare uniquement les tableaux skills[], presets[], views[] (pas updated_at
-    ni version qui sont des métadonnées de génération). Retourne True si OK.
-    """
     if not INDEX_PATH.exists():
-        print("✗ index.json absent — lancez : python scripts/generate_index.py")
+        print("✗ index.json absent — lancez : python scripts/build_index.py")
         return False
-
     try:
         current = json.loads(INDEX_PATH.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError) as exc:
@@ -261,27 +235,24 @@ def check() -> bool:
 
     generated = generate()
     ok = True
-
     for key in ("skills", "presets", "views"):
-        current_arr = _sort_by_name(current.get(key) or [])
-        generated_arr = _sort_by_name(generated.get(key) or [])
-
-        if current_arr != generated_arr:
+        cur = _sort(current.get(key) or [])
+        gen = _sort(generated.get(key) or [])
+        if cur != gen:
             ok = False
             print(f"✗ index.json['{key}'] désynchronisé avec les manifestes.")
-            current_names = {e.get("name", "?") for e in current_arr}
-            generated_names = {e.get("name", "?") for e in generated_arr}
-            added = generated_names - current_names
-            removed = current_names - generated_names
+            cur_names = {e.get("name", "?") for e in cur}
+            gen_names = {e.get("name", "?") for e in gen}
+            added = gen_names - cur_names
+            removed = cur_names - gen_names
             if added:
                 print(f"  Manifestes sans entrée index : {sorted(added)}")
             if removed:
-                print(f"  Entrées index sans manifeste  : {sorted(removed)}")
+                print(f"  Entrées index sans manifeste : {sorted(removed)}")
             if not added and not removed:
-                # Même noms mais contenu différent — lister les divergences
-                for gen, cur in zip(generated_arr, current_arr):
-                    if gen != cur:
-                        print(f"  '{gen['name']}' : contenu modifié")
+                for g, c in zip(gen, cur):
+                    if g != c:
+                        print(f"  '{g['name']}' : contenu modifié")
 
     if ok:
         totals = (
@@ -291,15 +262,13 @@ def check() -> bool:
         )
         print(f"✓ index.json à jour — {totals}")
     else:
-        print("\nLancez : python scripts/generate_index.py")
-
+        print("\nLancez : python scripts/build_index.py")
     return ok
 
 
 # ── Écriture ───────────────────────────────────────────────────────────────────
 
 def write() -> None:
-    """Écrit index.json à partir des manifestes (opération idempotente)."""
     index = generate()
     INDEX_PATH.write_text(
         json.dumps(index, ensure_ascii=False, indent=2) + "\n",
@@ -316,23 +285,17 @@ def write() -> None:
 # ── Point d'entrée ─────────────────────────────────────────────────────────────
 
 def main() -> int:
-    """Point d'entrée : génère ou vérifie index.json."""
     parser = argparse.ArgumentParser(
         description="Génère index.json depuis les manifestes skill.yaml et VIEW.md."
     )
     parser.add_argument(
         "--check",
         action="store_true",
-        help=(
-            "Vérifie que index.json est synchronisé sans le modifier. "
-            "Retourne exit code 1 si désynchronisé."
-        ),
+        help="Vérifie que index.json est synchronisé sans le modifier (exit ≠ 0 si désynchronisé).",
     )
     args = parser.parse_args()
-
     if args.check:
         return 0 if check() else 1
-
     write()
     return 0
 

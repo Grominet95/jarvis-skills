@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "updated_at": "2026-06-05",
+  "updated_at": "2026-06-09",
   "skills": [
     {
       "name": "bambulab-printer",
@@ -294,24 +294,23 @@
       "requires_env": []
     },
     {
-      "name": "globe-view",
+      "name": "globe",
       "version": "1.0.0",
       "author": "BarthH95",
-      "description": "Vue globe terrestre temps réel — navigation vocale, vols en direct, météo, navires.",
+      "description": "Globe terrestre interactif temps réel — navigation vocale et vols animés",
       "tags": [
-        "view",
-        "globe",
-        "map",
         "geo",
-        "realtime"
+        "realtime",
+        "map",
+        "globe",
+        "navigation"
       ],
       "path": "views/globe",
-      "static_files": [
-        "globe.js",
-        "globe.css"
-      ],
+      "static_files": [],
       "requires_tools": [],
-      "requires_env": []
+      "requires_env": [
+        "MAPBOX_TOKEN"
+      ]
     },
     {
       "name": "planetarium",
