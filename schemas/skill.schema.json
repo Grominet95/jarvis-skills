@@ -20,31 +20,28 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "schema_version": {
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/schema_version"
+    },
     "name": {
-      "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/kebab_id",
       "description": "Identifiant unique kebab-case (lettres minuscules, chiffres, tirets)"
     },
     "version": {
-      "type": "string",
-      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
-      "description": "Version sémantique MAJOR.MINOR.PATCH"
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/semver"
     },
     "author": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Pseudo GitHub de l'auteur"
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/author"
     },
     "description": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Description en une phrase claire"
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/description_field"
     },
     "tags": {
-      "type": "array",
-      "items": { "type": "string" },
-      "minItems": 1,
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/tags",
       "description": "Mots-clés pour le filtre du marketplace"
+    },
+    "permissions": {
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/permissions"
     },
     "type": {
       "const": "conversational",
@@ -68,42 +65,7 @@
       "description": "Plateformes supportées"
     },
     "requires_env": {
-      "type": "array",
-      "description": "Variables d'environnement requises",
-      "items": {
-        "oneOf": [
-          {
-            "type": "string",
-            "minLength": 1,
-            "description": "Nom de la variable (forme courte)"
-          },
-          {
-            "type": "object",
-            "required": ["name", "description"],
-            "additionalProperties": false,
-            "properties": {
-              "name": {
-                "type": "string",
-                "minLength": 1,
-                "description": "Nom de la variable d'environnement (ex: YOUTUBE_API_KEY)"
-              },
-              "description": {
-                "type": "string",
-                "minLength": 1,
-                "description": "Explication et contexte"
-              },
-              "example": {
-                "type": "string",
-                "description": "Valeur d'exemple"
-              },
-              "sensitive": {
-                "type": "boolean",
-                "description": "true si la valeur est un secret (API key, token, mot de passe)"
-              }
-            }
-          }
-        ]
-      }
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/requires_env"
     },
     "requires_tools": {
       "type": "array",
@@ -123,42 +85,18 @@
         "required": ["name", "description", "url", "required"],
         "additionalProperties": false,
         "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Nom affiché de l'application"
-          },
-          "description": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Pourquoi cette application est nécessaire"
-          },
-          "url": {
-            "type": "string",
-            "format": "uri",
-            "description": "URL de téléchargement"
-          },
-          "mac_bundle": {
-            "type": "string",
-            "description": "Nom dans /Applications/ (ex: \"Visual Studio Code\")"
-          },
-          "windows_exe": {
-            "type": "string",
-            "description": "Nom du processus Windows (ex: \"code.exe\")"
-          },
-          "required": {
-            "type": "boolean",
-            "description": "true = bloquant (skill non fonctionnel sans), false = optionnel"
-          }
+          "name": { "type": "string", "minLength": 1, "description": "Nom affiché de l'application" },
+          "description": { "type": "string", "minLength": 1, "description": "Pourquoi cette application est nécessaire" },
+          "url": { "type": "string", "format": "uri", "description": "URL de téléchargement" },
+          "mac_bundle": { "type": "string", "description": "Nom dans /Applications/ (ex: \"Visual Studio Code\")" },
+          "windows_exe": { "type": "string", "description": "Nom du processus Windows (ex: \"code.exe\")" },
+          "required": { "type": "boolean", "description": "true = bloquant, false = optionnel" }
         }
       }
     },
     "capabilities": {
       "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
+      "items": { "type": "string", "minLength": 1 },
       "minItems": 1,
       "maxItems": 6,
       "description": "Liste de ce que le skill peut faire — max 6, chaque item commence par un verbe à la 3e personne"

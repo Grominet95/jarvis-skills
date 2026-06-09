@@ -2,14 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://grominet95.github.io/jarvis-skills/schemas/index.schema.json",
   "title": "Jarvis Skills — index.json",
-  "description": "Schéma de validation de l'index global du catalogue jarvis-skills",
+  "description": "Schéma de validation de l'index global du catalogue jarvis-skills. Reflète exactement la structure produite par build_index.py (trois tableaux distincts).",
   "type": "object",
-  "required": ["version", "updated_at", "skills"],
+  "required": ["version", "updated_at", "skills", "presets", "views"],
   "additionalProperties": false,
   "properties": {
     "version": {
       "type": "string",
-      "description": "Version de l'index (ex: \"1.4\")"
+      "description": "Version du format d'index (ex: \"2.0\")"
     },
     "updated_at": {
       "type": "string",
@@ -18,146 +18,90 @@
     },
     "skills": {
       "type": "array",
-      "description": "Ensemble des entrées du catalogue (skills conversationnels, presets et vues)",
-      "items": {
-        "type": "object",
-        "required": ["name", "version", "author", "description", "tags", "path"],
-        "properties": {
-          "name": {
-            "type": "string",
-            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
-          },
-          "version": {
-            "type": "string",
-            "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
-          },
-          "author": { "type": "string", "minLength": 1 },
-          "description": { "type": "string", "minLength": 1 },
-          "tags": {
-            "type": "array",
-            "items": { "type": "string" },
-            "minItems": 1
-          },
-          "path": { "type": "string", "minLength": 1 }
-        },
-        "allOf": [
-          {
-            "if": {
-              "properties": { "type": { "const": "conversational" } },
-              "required": ["type"]
-            },
-            "then": { "$ref": "#/$defs/skill_entry" }
-          },
-          {
-            "if": {
-              "properties": { "type": { "const": "preset" } },
-              "required": ["type"]
-            },
-            "then": { "$ref": "#/$defs/preset_entry" }
-          },
-          {
-            "if": {
-              "not": { "required": ["type"] }
-            },
-            "then": { "$ref": "#/$defs/view_entry" }
-          }
-        ]
-      }
+      "description": "Skills conversationnels",
+      "items": { "$ref": "#/$defs/skill_entry" }
+    },
+    "presets": {
+      "type": "array",
+      "description": "Skills de type preset",
+      "items": { "$ref": "#/$defs/preset_entry" }
+    },
+    "views": {
+      "type": "array",
+      "description": "Vues frontend",
+      "items": { "$ref": "#/$defs/view_entry" }
     }
   },
   "$defs": {
-    "skill_entry": {
-      "description": "Entrée d'un skill conversationnel dans l'index",
-      "required": ["type", "requires_env", "requires_tools", "requires_oauth", "requires_apps", "capabilities", "platforms"],
+    "base_entry": {
+      "type": "object",
+      "required": ["name", "version", "author", "description", "tags", "path"],
       "properties": {
-        "type": { "const": "conversational" },
-        "requires_env": {
-          "type": "array",
-          "items": { "type": "string" }
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
         },
-        "requires_tools": {
-          "type": "array",
-          "items": { "type": "string" }
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
         },
-        "requires_oauth": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "requires_apps": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "capabilities": {
+        "author": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "tags": {
           "type": "array",
           "items": { "type": "string" },
-          "minItems": 1,
-          "maxItems": 6
-        },
-        "platforms": {
-          "type": "array",
-          "items": { "enum": ["mac", "windows", "linux"] },
           "minItems": 1
-        }
+        },
+        "path": { "type": "string", "minLength": 1 }
       }
+    },
+    "skill_entry": {
+      "allOf": [
+        { "$ref": "#/$defs/base_entry" },
+        {
+          "required": ["type", "requires_env", "requires_tools", "requires_oauth", "requires_apps", "capabilities", "platforms"],
+          "properties": {
+            "type": { "const": "conversational" },
+            "requires_env": { "type": "array", "items": { "type": "string" } },
+            "requires_tools": { "type": "array", "items": { "type": "string" } },
+            "requires_oauth": { "type": "array", "items": { "type": "string" } },
+            "requires_apps": { "type": "array", "items": { "type": "string" } },
+            "capabilities": { "type": "array", "items": { "type": "string" }, "minItems": 1, "maxItems": 6 },
+            "platforms": { "type": "array", "items": { "enum": ["mac", "windows", "linux"] }, "minItems": 1 }
+          }
+        }
+      ]
     },
     "preset_entry": {
-      "description": "Entrée d'une preset dans l'index",
-      "required": ["type", "triggers", "requires_env", "requires_tools", "requires_oauth", "requires_apps", "capabilities", "platforms"],
-      "properties": {
-        "type": { "const": "preset" },
-        "triggers": {
-          "type": "array",
-          "items": { "type": "string" },
-          "minItems": 1
-        },
-        "requires_env": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "requires_tools": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "requires_oauth": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "requires_apps": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "capabilities": {
-          "type": "array",
-          "items": { "type": "string" },
-          "minItems": 1,
-          "maxItems": 6
-        },
-        "platforms": {
-          "type": "array",
-          "items": { "enum": ["mac", "windows", "linux"] },
-          "minItems": 1
+      "allOf": [
+        { "$ref": "#/$defs/base_entry" },
+        {
+          "required": ["type", "triggers", "requires_env", "requires_tools", "requires_oauth", "requires_apps", "capabilities", "platforms"],
+          "properties": {
+            "type": { "const": "preset" },
+            "triggers": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+            "requires_env": { "type": "array", "items": { "type": "string" } },
+            "requires_tools": { "type": "array", "items": { "type": "string" } },
+            "requires_oauth": { "type": "array", "items": { "type": "string" } },
+            "requires_apps": { "type": "array", "items": { "type": "string" } },
+            "capabilities": { "type": "array", "items": { "type": "string" }, "minItems": 1, "maxItems": 6 },
+            "platforms": { "type": "array", "items": { "enum": ["mac", "windows", "linux"] }, "minItems": 1 }
+          }
         }
-      }
+      ]
     },
     "view_entry": {
-      "description": "Entrée d'une vue dans l'index (pas de champ type)",
-      "required": ["static_files", "requires_tools", "requires_env"],
-      "properties": {
-        "static_files": {
-          "type": "array",
-          "items": { "type": "string" },
-          "minItems": 1,
-          "description": "Fichiers statiques frontend à charger (ex: globe.js, globe.css)"
-        },
-        "requires_tools": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "requires_env": {
-          "type": "array",
-          "items": { "type": "string" }
+      "allOf": [
+        { "$ref": "#/$defs/base_entry" },
+        {
+          "required": ["requires_tools", "requires_env"],
+          "properties": {
+            "static_files": { "type": "array", "items": { "type": "string" } },
+            "requires_tools": { "type": "array", "items": { "type": "string" } },
+            "requires_env": { "type": "array", "items": { "type": "string" } }
+          }
         }
-      }
+      ]
     }
   }
 }

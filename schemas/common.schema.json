@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json",
+  "title": "Jarvis Skills — socle commun",
+  "description": "Définitions partagées par les trois types de contribution (skill, preset, vue). Ne pas valider directement — référencé via $ref depuis les schémas de type.",
+  "$defs": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Version du schéma de contribution — doit être \"1.0\""
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "description": "Version sémantique MAJOR.MINOR.PATCH"
+    },
+    "kebab_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Identifiant unique kebab-case (lettres minuscules, chiffres, tirets)"
+    },
+    "author": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Pseudo GitHub de l'auteur"
+    },
+    "description_field": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Description en une phrase claire"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Mots-clés pour le filtre du marketplace"
+    },
+    "permissions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["network", "filesystem", "audio", "cli", "display", "notifications"]
+      },
+      "description": "Permissions explicites requises par la contribution (optionnel, documentaire)"
+    },
+    "requires_env_item": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "description": "Nom de la variable (forme courte)"
+        },
+        {
+          "type": "object",
+          "required": ["name", "description"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "description": { "type": "string", "minLength": 1 },
+            "example": { "type": "string" },
+            "sensitive": { "type": "boolean" }
+          }
+        }
+      ]
+    },
+    "requires_env": {
+      "type": "array",
+      "description": "Variables d'environnement requises",
+      "items": { "$ref": "#/$defs/requires_env_item" }
+    }
+  }
+}

@@ -22,31 +22,28 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "schema_version": {
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/schema_version"
+    },
     "name": {
-      "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/kebab_id",
       "description": "Identifiant unique kebab-case (lettres minuscules, chiffres, tirets)"
     },
     "version": {
-      "type": "string",
-      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
-      "description": "Version sémantique MAJOR.MINOR.PATCH"
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/semver"
     },
     "author": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Pseudo GitHub de l'auteur"
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/author"
     },
     "description": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Description en une phrase claire"
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/description_field"
     },
     "tags": {
-      "type": "array",
-      "items": { "type": "string" },
-      "minItems": 1,
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/tags",
       "description": "Mots-clés — \"preset\" doit être le premier élément"
+    },
+    "permissions": {
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/permissions"
     },
     "type": {
       "const": "preset",
@@ -71,27 +68,7 @@
       "description": "Plateformes supportées — ne lister que les plateformes testées"
     },
     "requires_env": {
-      "type": "array",
-      "description": "Variables d'environnement requises",
-      "items": {
-        "oneOf": [
-          {
-            "type": "string",
-            "minLength": 1
-          },
-          {
-            "type": "object",
-            "required": ["name", "description"],
-            "additionalProperties": false,
-            "properties": {
-              "name": { "type": "string", "minLength": 1 },
-              "description": { "type": "string", "minLength": 1 },
-              "example": { "type": "string" },
-              "sensitive": { "type": "boolean" }
-            }
-          }
-        ]
-      }
+      "$ref": "https://grominet95.github.io/jarvis-skills/schemas/common.schema.json#/$defs/requires_env"
     },
     "requires_tools": {
       "type": "array",
@@ -114,14 +91,8 @@
           "name": { "type": "string", "minLength": 1 },
           "description": { "type": "string", "minLength": 1 },
           "url": { "type": "string", "format": "uri" },
-          "mac_bundle": {
-            "type": "string",
-            "description": "Nom dans /Applications/ (ex: \"OBS\")"
-          },
-          "windows_exe": {
-            "type": "string",
-            "description": "Nom du processus Windows (ex: \"obs64.exe\")"
-          },
+          "mac_bundle": { "type": "string", "description": "Nom dans /Applications/ (ex: \"OBS\")" },
+          "windows_exe": { "type": "string", "description": "Nom du processus Windows (ex: \"obs64.exe\")" },
           "required": { "type": "boolean" }
         }
       }
@@ -132,6 +103,10 @@
       "minItems": 1,
       "maxItems": 6,
       "description": "Liste de ce que la preset fait — max 6, chaque item commence par un verbe"
+    },
+    "dry_run_possible": {
+      "type": "boolean",
+      "description": "true si un mode dry-run peut être activé côté jarvis-OS (obligatoire si steps CLI destructifs présents)"
     },
     "steps": {
       "type": "array",
@@ -158,10 +133,7 @@
       },
       "allOf": [
         {
-          "if": {
-            "properties": { "type": { "const": "cli" } },
-            "required": ["type"]
-          },
+          "if": { "properties": { "type": { "const": "cli" } }, "required": ["type"] },
           "then": {
             "description": "Step CLI : exécute une commande shell",
             "oneOf": [
@@ -175,11 +147,7 @@
               {
                 "required": ["command"],
                 "properties": {
-                  "command": {
-                    "type": "string",
-                    "minLength": 1,
-                    "description": "Commande identique sur tous les OS"
-                  },
+                  "command": { "type": "string", "minLength": 1, "description": "Commande identique sur tous les OS" },
                   "requires_confirmation": { "type": "boolean" }
                 }
               }
@@ -187,99 +155,55 @@
           }
         },
         {
-          "if": {
-            "properties": { "type": { "const": "spotify" } },
-            "required": ["type"]
-          },
+          "if": { "properties": { "type": { "const": "spotify" } }, "required": ["type"] },
           "then": {
             "required": ["action"],
             "properties": {
               "action": {
                 "type": "string",
-                "enum": ["search_playlist", "search_track", "play", "pause", "next"],
-                "description": "Action Spotify à exécuter"
+                "enum": ["search_playlist", "search_track", "play", "pause", "next"]
               },
-              "query": {
-                "type": "string",
-                "description": "Requête de recherche (requise pour search_playlist et search_track)"
-              }
+              "query": { "type": "string" }
             }
           }
         },
         {
-          "if": {
-            "properties": { "type": { "const": "tts" } },
-            "required": ["type"]
-          },
+          "if": { "properties": { "type": { "const": "tts" } }, "required": ["type"] },
           "then": {
             "required": ["text"],
             "properties": {
-              "text": {
-                "type": "string",
-                "minLength": 1,
-                "description": "Texte que Jarvis dit à voix haute (supporte les templates {{ var }})"
-              }
+              "text": { "type": "string", "minLength": 1 }
             }
           }
         },
         {
-          "if": {
-            "properties": { "type": { "const": "ai" } },
-            "required": ["type"]
-          },
+          "if": { "properties": { "type": { "const": "ai" } }, "required": ["type"] },
           "then": {
             "required": ["prompt"],
             "properties": {
-              "prompt": {
-                "type": "string",
-                "minLength": 1,
-                "description": "Instruction envoyée au LLM"
-              },
-              "output_var": {
-                "type": "string",
-                "pattern": "^[a-z_][a-z0-9_]*$",
-                "description": "Nom de variable pour capturer la réponse (utilisable dans les steps suivants via {{ var.text }})"
-              }
+              "prompt": { "type": "string", "minLength": 1 },
+              "output_var": { "type": "string", "pattern": "^[a-z_][a-z0-9_]*$" }
             }
           }
         },
         {
-          "if": {
-            "properties": { "type": { "const": "wait" } },
-            "required": ["type"]
-          },
+          "if": { "properties": { "type": { "const": "wait" } }, "required": ["type"] },
           "then": {
             "required": ["seconds"],
             "properties": {
-              "seconds": {
-                "type": "number",
-                "exclusiveMinimum": 0,
-                "description": "Durée d'attente en secondes"
-              }
+              "seconds": { "type": "number", "exclusiveMinimum": 0 }
             }
           }
         },
         {
-          "if": {
-            "properties": { "type": { "const": "notify" } },
-            "required": ["type"]
-          },
+          "if": { "properties": { "type": { "const": "notify" } }, "required": ["type"] },
           "then": {
             "required": ["title", "body"],
             "properties": {
-              "title": {
-                "type": "string",
-                "minLength": 1,
-                "description": "Titre de la notification système"
-              },
-              "body": {
-                "type": "string",
-                "minLength": 1,
-                "description": "Corps de la notification"
-              },
+              "title": { "type": "string", "minLength": 1 },
+              "body": { "type": "string", "minLength": 1 },
               "platforms": {
                 "type": "object",
-                "description": "Activer/désactiver par plateforme (null = skippé)",
                 "properties": {
                   "mac":     { "type": ["boolean", "null"] },
                   "windows": { "type": ["boolean", "null"] },
