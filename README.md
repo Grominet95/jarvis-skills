@@ -68,10 +68,32 @@ Le dossier [views/TEMPLATE/](views/TEMPLATE/) contient un template vide comment�
 
 ---
 
+## Format & validation
+
+Chaque manifest déclare `schema_version: "1.0"` et un socle commun de champs
+(`name`, `version`, `author`, `description`, `tags`, `platforms`, `capabilities`)
+validés automatiquement par schéma JSON.
+
+Toute PR passe une validation statique complète — conformité de schéma, scan de secrets,
+héritage `SkillBase`, cohérence de l'index — sans jamais exécuter le code de la contribution.
+Le test d'exécution réel vit dans Jarvis OS (sandbox Docker du Skill Lab).
+
+---
+
 ## Contribuer
 
-Tu veux ajouter une capacité à Jarvis et la partager avec la communauté ?
-Lis [CONTRIBUTING.md](CONTRIBUTING.md), le process est rapide.
+Tu veux ajouter une capacité à Jarvis et la partager ?
+
+1. **Crée** depuis un template (`templates/skill-preset/` pour un skill ou preset, `views/TEMPLATE/` pour une vue)
+2. **Valide** en statique, sans Jarvis :
+   ```bash
+   python scripts/validate_catalog.py skills/mon-skill
+   python scripts/build_index.py
+   ```
+3. **Teste en réel** dans Jarvis OS via les outils de dev local — `scripts/install_local_extension.py` en symlink, `scripts/preview_view.py` pour les vues, `scripts/dry_run_preset.py` pour les presets. Ces scripts vivent dans le repo jarvis-OS.
+4. **Ouvre une PR** : la CI relance la validation statique automatiquement. Une checklist et une attestation "testé en réel" te sont demandées.
+
+Le détail est dans [CONTRIBUTING.md](CONTRIBUTING.md). Tu contribues en tant qu'agent ? Lis [AGENTS.md](AGENTS.md).
 
 ---
 
