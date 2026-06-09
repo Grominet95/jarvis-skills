@@ -1,4 +1,4 @@
-name: Validation des skills Jarvis
+name: Validation du catalogue Jarvis
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   validate:
-    name: Valider manifestes + index
+    name: Valider manifestes + index + sécurité
     runs-on: ubuntu-latest
 
     steps:
@@ -20,29 +20,41 @@ jobs:
           python-version: "3.11"
 
       - name: Installation des dépendances
-        run: pip install jsonschema pyyaml
+        run: pip install jsonschema pyyaml yamllint
 
-      # ── Étape 1 : validation structurelle des manifestes ──────────────────
-      # Dépend de schemas/*.schema.json (agent docs/machine-standards).
-      # Si les schémas sont absents, la validation structurelle est ignorée
-      # avec avertissement ; les autres vérifications (kebab-case, semver,
-      # AST, secrets) restent actives.
-      - name: Validation des manifestes (validate_skills.py)
-        run: python scripts/validate_skills.py
-
-      # ── Étape 2 : cohérence index.json ────────────────────────────────────
-      # Échoue si index.json n'a pas été régénéré après modification d'un
-      # manifeste. Lancer `python scripts/generate_index.py` en local pour le mettre à jour.
-      - name: Cohérence index.json (generate_index.py --check)
-        run: python scripts/generate_index.py --check
-
-      # ── Étape 3 : analyse de sécurité ─────────────────────────────────────
-      # Dépend de scripts/scan_security.py (agent feat/security-scan).
-      # Ignoré avec message explicite si le fichier est absent.
-      - name: Analyse de sécurité (scan_security.py)
+      # ── Étape 1 : lint YAML ──────────────────────────────────────────────
+      - name: Lint YAML (yamllint)
         run: |
-          if [ -f scripts/scan_security.py ]; then
-            python scripts/scan_security.py
-          else
-            echo "⚠ scripts/scan_security.py non disponible (dépendance feat/security-scan — ignoré)"
-          fi
+          yamllint -d "{extends: relaxed, rules: {line-length: {max: 200}}}" \
+            skills/ views/ .github/workflows/
+        continue-on-error: false
+
+      # ── Étape 2 : lint JSON ──────────────────────────────────────────────
+      - name: Lint JSON
+        run: |
+          python - <<'EOF'
+          import json, sys, pathlib
+          ok = True
+          for f in list(pathlib.Path("schemas").glob("*.json")) + [pathlib.Path("index.json")]:
+              try:
+                  json.loads(f.read_text())
+              except json.JSONDecodeError as e:
+                  print(f"✗ {f}: {e}", file=sys.stderr)
+                  ok = False
+          sys.exit(0 if ok else 1)
+          EOF
+
+      # ── Étape 3 : validation structurelle des manifestes ─────────────────
+      # Zéro import ni exécution du code de contribution.
+      - name: Validation des manifestes (validate_catalog.py --all)
+        run: python scripts/validate_catalog.py --all
+
+      # ── Étape 4 : cohérence index.json ───────────────────────────────────
+      # Échoue si index.json n'a pas été régénéré après modification d'un manifeste.
+      - name: Cohérence index.json (build_index.py --check)
+        run: python scripts/build_index.py --check
+
+      # ── Étape 5 : analyse de sécurité ────────────────────────────────────
+      # AST statique — jamais d'exécution du code des contributions.
+      - name: Analyse de sécurité (scan_security.py)
+        run: python scripts/scan_security.py
