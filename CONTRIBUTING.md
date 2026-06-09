@@ -25,6 +25,7 @@ Le nom doit être en kebab-case (tirets, pas d'espaces).
 
 ```yaml
 name: mon-skill
+schema_version: "1.0"
 version: 1.0.0
 author: ton-pseudo-github
 description: Ce que fait le skill en une phrase claire.
@@ -39,6 +40,8 @@ capabilities:
   - "Récupère des données depuis une source"
   - "Génère un résultat concret"
 ```
+
+> Le champ `schema_version: "1.0"` est obligatoire pour toute nouvelle contribution.
 
 ### 4. Crée `skill.py`
 
@@ -59,10 +62,20 @@ class MonSkill(SkillBase):
 Copie ton dossier dans `JARVIS_V3/skills/installed/mon-skill/`
 et vérifie que Jarvis se comporte correctement.
 
-### 6. Ouvre une Pull Request
+### 6. Valide et régénère l'index
 
-- Ajoute ton skill dans `index.json`
-- Ouvre la PR avec le template fourni
+```bash
+# Valider la contribution (zéro ❌ requis)
+python scripts/validate_catalog.py skills/mon-skill
+
+# Régénérer l'index (jamais à la main)
+python scripts/build_index.py
+python scripts/build_index.py --check
+```
+
+### 7. Ouvre une Pull Request
+
+Utilise le template de PR fourni — toutes les cases de la checklist doivent être cochées.
 
 ### Champs requires_apps
 
@@ -117,16 +130,19 @@ cp -r templates/skill-preset/ skills/ma-preset/
 ### Règles importantes
 
 1. `type: preset` obligatoire dans skill.yaml
-2. `"preset"` doit être le premier tag
-3. Tester sur toutes les plateformes déclarées dans `platforms`
-4. Mettre `null` pour les plateformes non testées
-5. Pas de commandes destructives sans `requires_confirmation: true`
-6. Mettre à jour `index.json` avec `"type": "preset"`
+2. `schema_version: "1.0"` obligatoire
+3. `"preset"` doit être le premier tag
+4. `triggers` non-vide — obligatoire (le Skill Lab rejette si vide)
+5. Tester sur toutes les plateformes déclarées dans `platforms`
+6. Mettre `null` pour les plateformes non testées
+7. Pas de commandes destructives-données sans `requires_confirmation: true`
+8. `dry_run_possible: true/false` déclaré si steps CLI présents
+9. **Jamais modifier `index.json` manuellement** — toujours via `build_index.py`
 
 ### Checklist PR
 
-- [ ] skill.yaml valide avec type: preset
+- [ ] `validate_catalog.py skills/ma-preset` → exit 0, zéro ❌
+- [ ] `build_index.py` exécuté et index.json commité
 - [ ] Testé sur mac OU windows (selon platforms déclaré)
-- [ ] Aucune commande destructive non confirmée
-- [ ] index.json mis à jour
-- [ ] skill.py minimal avec classe héritant de PresetSkill
+- [ ] Aucune commande destructive-données non confirmée
+- [ ] skill.py minimal avec classe héritant de `PresetSkill`

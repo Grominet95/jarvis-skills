@@ -13,36 +13,53 @@
 - [ ] Fonctionne avec les tools déclarés dans `requires_tools`
 - [ ] Variables `.env` documentées dans `requires_env`
 
-### Tags
-<!-- ex: research, web, productivity, music, code, preset, view -->
+---
 
-### Notes pour la review
-<!-- Tout ce qui serait utile -->
+### Checklist obligatoire avant de soumettre
+
+#### Pipeline de validation (toutes les cases doivent être cochées)
+
+```bash
+# 1. Valider la contribution
+python scripts/validate_catalog.py skills/mon-skill   # ou views/ma-vue
+
+# 2. Régénérer l'index
+python scripts/build_index.py
+
+# 3. Vérifier la synchronisation
+python scripts/build_index.py --check
+
+# 4. Vérification sécurité (incluse dans validate_catalog, mais utile seule)
+python scripts/scan_security.py skills/mon-skill
+```
+
+- [ ] `validate_catalog.py` : exit 0, **zéro ❌** (les ⚠ sont acceptés)
+- [ ] `build_index.py` exécuté et `index.json` commité
+- [ ] `build_index.py --check` : ✓ à jour
+- [ ] Aucun secret hardcodé — clés API dans `requires_env` + `os.getenv()`
+- [ ] `schema_version: "1.0"` présent dans le manifest
+- [ ] Permissions déclarées (`platforms` non-vide, `requires_tools` cohérent)
+- [ ] Variables d'env documentées (forme objet avec `name` + `description`)
+- [ ] Contribution testée **en réel dans jarvis-OS** (Skill Lab)
+
+#### Spécifique preset
+- [ ] `triggers` non-vide (sinon Skill Lab refusera au gate `system_prompt`)
+- [ ] Commandes destructives : `requires_confirmation: true` déclaré
+- [ ] `dry_run_possible: true/false` déclaré
+- [ ] Dry-run vérifié côté jarvis-OS
+
+#### Spécifique vue
+- [ ] `commands` déclarées dans VIEW.md si `tool.py` expose une méthode `command()`
+- [ ] Preview locale vérifiée (harness HTML ou jarvis-OS)
+- [ ] `glyph` défini (2-4 lettres majuscules)
 
 ---
 
-### Checklist avant de soumettre
+### Notes pour la review
+<!-- Tout ce qui serait utile au reviewer -->
 
-#### Standards à lire selon ton type de contribution
-- Skill / Preset → [CONTRIBUTING.md](../CONTRIBUTING.md)
-- Vue → [VIEWS_STANDARD.md](../VIEWS_STANDARD.md)
+---
 
-#### index.json
-> `index.json` est **généré automatiquement** — ne l'édite jamais à la main.
-> La CI échoue si l'index est désynchronisé avec les manifestes.
-
-```bash
-# Après avoir créé ou modifié ton skill.yaml / VIEW.md :
-python scripts/generate_index.py
-
-# Vérifier localement que la CI passera :
-python scripts/validate_skills.py
-python scripts/generate_index.py --check
-```
-
-- [ ] `python scripts/generate_index.py` lancé et index.json commité
-- [ ] `python scripts/validate_skills.py` passe sans erreur (0 erreurs)
-- [ ] Le nom du dossier est en kebab-case et correspond au champ `name` dans le yaml
-- [ ] La `version` est en semver (ex : `1.0.0`)
-- [ ] `skill.py` définit une classe héritant de `SkillBase` (skill) ou `PresetSkill` (preset)
-- [ ] Aucune clé API hardcodée — utiliser `requires_env`
+> **Rappel** : `jarvis-skills` valide la conformité statique.
+> Le comportement exécuté est validé par le Skill Lab de jarvis-OS.
+> L'attestation "testé en réel" est une déclaration humaine — la CI ne peut pas la vérifier.
