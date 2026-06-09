@@ -1,5 +1,6 @@
 ---
 id: weather
+schema_version: "1.0"
 name: Weather
 version: 1.0.0
 author: Grominet95

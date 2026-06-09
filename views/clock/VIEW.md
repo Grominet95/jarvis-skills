@@ -1,5 +1,6 @@
 ---
 id: clock
+schema_version: "1.0"
 name: Clock
 version: 1.0.0
 author: Grominet95

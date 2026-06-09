@@ -1,5 +1,6 @@
 ---
 id: globe
+schema_version: "1.0"
 name: Globe
 version: 1.0.0
 author: BarthH95

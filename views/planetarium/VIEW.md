@@ -1,5 +1,6 @@
 ---
 id: planetarium
+schema_version: "1.0"
 name: Planétarium
 version: 1.0.0
 author: Grominet95

@@ -1,5 +1,6 @@
 ---
 id: astronomy
+schema_version: "1.0"
 name: Carte du ciel
 version: 3.0.0
 author: Grominet95

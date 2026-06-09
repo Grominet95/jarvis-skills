@@ -1,5 +1,6 @@
 ---
 id: system-monitor
+schema_version: "1.0"
 name: System Monitor
 version: 2.0.0
 author: Grominet95
