@@ -102,7 +102,9 @@ puis se répercute ici.
 | `Thumb_Up` | discrete | — |
 | `Thumb_Down` | discrete | — |
 | `Pointing_Up` | discrete | — |
-| `pinch_y` | continuous | `delta` (±10) |
+| `two_hand_zoom` | continuous | `delta` (±) |
+| `fist_pan` | continuous | `dx`, `dy` (±) |
+| `pinch_y` | continuous | `delta` (±10) — *zoom 1 main, legacy ; non bindé sur le globe (→ volume global)* |
 | `hand_drag_x` | continuous | `delta` *(à venir côté MediaPipe)* |
 
 ### Champs d'un binding
@@ -129,10 +131,14 @@ saccadé (trop lent) ou noie la vue d'événements (trop rapide).
 
 ```yaml
 gestures:
-  - "on": pinch_y      # 'on' quoté : mot réservé booléen en YAML 1.1
+  - "on": two_hand_zoom   # 'on' quoté : mot réservé booléen en YAML 1.1
     command: zoom_by
     mode: continuous
     throttle_ms: 80
+  - "on": fist_pan
+    command: pan_by
+    mode: continuous
+    throttle_ms: 50
   - "on": Open_Palm
     command: toggle_rotation
     mode: discrete
