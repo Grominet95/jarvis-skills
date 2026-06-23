@@ -15,6 +15,7 @@
   let rotationTimer = null;
   let container = null;
   let toastTimer = null;
+  let autoRotateOn = false;
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -82,6 +83,7 @@
 
   function startAutoRotation() {
     stopAutoRotation();
+    autoRotateOn = true;
     rotationTimer = setInterval(() => {
       if (!map) return;
       map.setBearing((map.getBearing() + 0.1) % 360);
@@ -91,6 +93,7 @@
   function stopAutoRotation() {
     clearInterval(rotationTimer);
     rotationTimer = null;
+    autoRotateOn = false;
   }
 
   function ensureContainer() {
@@ -118,6 +121,15 @@
       desc: 'Globe terrestre interactif avec navigation vocale',
       glyph: 'GLB',
       tags: ['geo', 'realtime', 'map', 'globe'],
+    },
+
+    // Bindings gestuels lus par le routeur jarvis-OS quand la vue a le focus.
+    // Clé = geste standard (vocabulaire jarvis-OS), valeur = commande ou action.
+    gestures: {
+      pinch_y:    'zoom_by',          // continu — delta transmis dans params
+      Open_Palm:  'toggle_rotation',  // discret
+      Victory:    'globe_view',       // discret — réutilise la commande existante
+      Thumb_Down: { type: 'hide' },   // discret — ferme la vue
     },
 
     async show(params = {}) {
@@ -225,6 +237,21 @@
           stopAutoRotation();
           map.flyTo({ center: [10, 20], zoom: 1.5, duration: 2000, essential: true });
           map.once('moveend', startAutoRotation);
+          break;
+        }
+
+        case 'zoom_by': {
+          if (!map) return;
+          stopAutoRotation();
+          const delta = Number(params.delta || 0);          // ±10 typiquement
+          const next = Math.max(0, Math.min(22, map.getZoom() + delta * 0.04));
+          map.easeTo({ zoom: next, duration: 90, essential: true });
+          break;
+        }
+
+        case 'toggle_rotation': {
+          if (!map) return;
+          autoRotateOn ? stopAutoRotation() : startAutoRotation();
           break;
         }
 

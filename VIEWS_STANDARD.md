@@ -72,6 +72,77 @@ commands:
 | `tags` | list | Mots-clés pour le filtre du marketplace |
 | `requires_env` | list | Variables d'environnement requises |
 | `commands` | list | Commandes supportées par `command()` |
+| `gestures` | list | Bindings gestuels actifs quand la vue a le focus (voir ci-dessous) |
+
+---
+
+## Bindings gestuels — `gestures`
+
+Champ **optionnel**, miroir de `commands`. Il déclare ce que les gestes MediaPipe
+doivent déclencher **quand la vue a le focus**. Une vue active n'« écoute » pas la
+caméra elle-même : elle déclare une **intention d'interaction** — « quand Jarvis
+reçoit tel geste standard, appelle telle commande chez moi ». Le routeur de
+`jarvis-OS` lit ce champ ; si aucune vue active ne binde un geste, il retombe sur
+le fallback global (musique, etc.).
+
+> **Règle d'or — une vue déclare une intention, pas du code MediaPipe.**
+> Aucune vue ne pilote MediaPipe ni n'instancie de détecteur. Elle se contente de
+> mapper un geste standard → une commande déjà déclarée dans `commands`.
+
+### Vocabulaire des gestes (contrat partagé avec jarvis-OS)
+
+Le `on` de chaque binding **doit** appartenir à ce vocabulaire. N'inventez pas de
+nom : un nouveau geste s'ajoute d'abord côté `jarvis-OS` (détection + tableau),
+puis se répercute ici.
+
+| `on` | Type | Payload |
+|------|------|---------|
+| `Open_Palm` | discrete | — |
+| `Victory` | discrete | — |
+| `Thumb_Up` | discrete | — |
+| `Thumb_Down` | discrete | — |
+| `Pointing_Up` | discrete | — |
+| `pinch_y` | continuous | `delta` (±10) |
+| `hand_drag_x` | continuous | `delta` *(à venir côté MediaPipe)* |
+
+### Champs d'un binding
+
+> ⚠️ **Quoter la clé `on`** dans le YAML : `on` est un mot réservé booléen en
+> YAML 1.1 (`on`/`off`/`yes`/`no`). Non quoté, `on: pinch_y` est parsé comme la
+> clé booléenne `true` et le binding est rejeté. Écrire `"on": pinch_y`.
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `on` | string | Nom du geste standard (obligatoire). À quoter en YAML (`"on":`). |
+| `command` | string | Commande de la vue à appeler — **doit figurer dans `commands`**. Exclusif avec `action`. |
+| `action` | enum | Action standard côté routeur (`hide_view`). Exclusif avec `command`. |
+| `mode` | enum | `discrete` (one-shot) ou `continuous` (flux throttlé). |
+| `throttle_ms` | int | Pour les gestes `continuous`. |
+| `hold_ms` | int | Maintien requis pour les gestes `discrete`. |
+
+`discrete` vs `continuous` : un geste discret (paume, victoire) se déclenche une
+fois, avec éventuellement un `hold_ms`/cooldown ; un geste continu (pincement)
+émet un flux — throttler à **50-100 ms** pour un rendu fluide, sinon le zoom est
+saccadé (trop lent) ou noie la vue d'événements (trop rapide).
+
+### Exemple (globe)
+
+```yaml
+gestures:
+  - "on": pinch_y      # 'on' quoté : mot réservé booléen en YAML 1.1
+    command: zoom_by
+    mode: continuous
+    throttle_ms: 80
+  - "on": Open_Palm
+    command: toggle_rotation
+    mode: discrete
+  - "on": Victory
+    command: globe_view
+    mode: discrete
+  - "on": Thumb_Down
+    action: hide_view
+    mode: discrete
+```
 
 ---
 
@@ -203,6 +274,7 @@ execute(action="fly_to")  ──►  view_command     ──►  command("fly_to
 - [ ] Container `#id-container` avec `position: fixed; inset: 0; z-index: 2`
 - [ ] Pas de dépendances npm — vanilla JS uniquement
 - [ ] Pas de clés API hardcodées — déclarer dans `requires_env`
+- [ ] `gestures` (si présent) : chaque `on` est du vocabulaire standard, chaque `command` est déclaré dans `commands`
 - [ ] Testé localement dans Jarvis
 
 ---

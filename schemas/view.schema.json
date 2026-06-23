@@ -79,6 +79,38 @@
           }
         }
       }
+    },
+    "gestures": {
+      "type": "array",
+      "description": "Bindings gestuels actifs quand la vue a le focus. Chaque entrée mappe un geste standard (vocabulaire jarvis-OS) vers une commande de la vue ou une action.",
+      "items": {
+        "type": "object",
+        "required": ["on"],
+        "additionalProperties": false,
+        "properties": {
+          "on": {
+            "type": "string",
+            "description": "Nom du geste standard (ex: pinch_y, Open_Palm, Victory)",
+            "minLength": 1
+          },
+          "command": {
+            "type": "string",
+            "description": "Commande de la vue à appeler (doit figurer dans 'commands'). Exclusif avec 'action'."
+          },
+          "action": {
+            "type": "string",
+            "enum": ["hide_view"],
+            "description": "Action standard côté routeur. Exclusif avec 'command'."
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["discrete", "continuous"],
+            "description": "Type de geste. discrete = one-shot ; continuous = flux throttlé."
+          },
+          "throttle_ms": { "type": "integer", "minimum": 0, "description": "Pour les gestes continus." },
+          "hold_ms": { "type": "integer", "minimum": 0, "description": "Maintien requis pour les gestes discrets." }
+        }
+      }
     }
   }
 }
