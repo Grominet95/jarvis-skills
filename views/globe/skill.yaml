@@ -5,9 +5,7 @@ author: BarthH95
 description: "Vue globe terrestre temps réel — navigation vocale, vols en direct, météo, navires."
 tags: [view, globe, map, geo, realtime]
 type: view
-static_files:
-  - globe.js
-  - globe.css
+static_files: []   # vue servie par view.js (canonique) ; legacy static/globe.js+css supprimés
 requires_env: []
 requires_tools: []
 capabilities:
