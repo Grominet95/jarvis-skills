@@ -167,17 +167,17 @@
         stopAutoRotation();
         const delta = Number(params.delta || 0);          // ± (alimenté par two_hand_zoom)
         const next = Math.max(0, Math.min(22, map.getZoom() + delta * 0.04));
-        map.easeTo({ zoom: next, duration: 90, essential: true });
+        map.easeTo({ zoom: next, duration: 0, essential: true });   // instantané (était 90 ms)
         break;
       }
 
       case 'pan_by': {
         if (!map) return;
         stopAutoRotation();
-        const dx = Number(params.dx || 0);
-        const dy = Number(params.dy || 0);
-        // poing déplacé → panBy translate la carte (facteur d'échelle ajusté côté OS)
-        map.panBy([dx, dy], { duration: 90, easing: t => t });
+        const SENS = 2.5;                            // gain de navigation — ↑ = plus sensible
+        const dx =  Number(params.dx || 0) * SENS;
+        const dy = -Number(params.dy || 0) * SENS;   // ⟵ corrige l'inversion verticale
+        map.panBy([dx, dy], { duration: 0 });        // pan INSTANTANÉ : 1:1, précis (fini le lag 90 ms)
         break;
       }
 

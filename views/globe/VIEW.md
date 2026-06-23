@@ -2,7 +2,7 @@
 id: globe
 schema_version: "1.0"
 name: Globe
-version: 1.2.0
+version: 1.2.1
 author: BarthH95
 description: Globe terrestre interactif temps réel — navigation vocale et vols animés
 tags: [geo, realtime, map, globe, navigation]
