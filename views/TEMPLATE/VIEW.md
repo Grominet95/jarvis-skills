@@ -30,4 +30,33 @@ commands:
       param2: int
   - action: autre-commande
     description: Description
+
+# ── Bindings gestuels (optionnel) ──────────────────────────────────────────
+# Mappe un geste standard MediaPipe → une de TES commandes ci-dessus, quand la
+# vue a le focus. La vue ne pilote JAMAIS MediaPipe : elle déclare une intention
+# d'interaction ("tel geste → telle commande"). Le routeur de jarvis-OS lit ce
+# bloc ; si aucune vue active ne capte le geste, il retombe sur le fallback
+# global (musique / assistant).
+#
+# Le `on` doit appartenir au vocabulaire standard (cf. VIEWS_STANDARD.md) et
+# chaque `command` doit figurer dans `commands:` ci-dessus (sinon le validateur
+# échoue). Reflète ce bloc dans l'objet `gestures` de view.js (forme runtime).
+#
+# Gestes émis aujourd'hui par l'OS : discrets Open_Palm / Victory / Thumb_Up /
+# Thumb_Down / Pointing_Up ; continu pinch_y (payload `delta` ±10).
+#
+# ⚠ Quoter la clé "on" : `on` est un mot réservé booléen en YAML 1.1.
+# Décommenter et adapter — supprimer si la vue n'utilise pas les gestes.
+#
+# gestures:
+#   - "on": pinch_y          # continu — `delta` transmis dans params à command()
+#     command: ma-commande   # doit exister dans `commands:`
+#     mode: continuous
+#     throttle_ms: 80        # cadence de throttle (50-100 ms) pour un flux fluide
+#   - "on": Victory          # discret — one-shot
+#     command: autre-commande
+#     mode: discrete
+#   - "on": Thumb_Down       # action standard du routeur : ferme la vue
+#     action: hide_view      # exclusif avec `command`
+#     mode: discrete
 ---

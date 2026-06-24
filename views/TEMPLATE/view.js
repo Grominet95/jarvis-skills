@@ -61,6 +61,19 @@
       tags: ['tag1', 'tag2'],
     },
 
+    // ── Bindings gestuels (optionnel) ──────────────────────────────────────
+    // Forme RUNTIME lue par le routeur de jarvis-OS quand la vue a le focus.
+    //   clé    = nom du geste standard (cf. VIEW.md / VIEWS_STANDARD.md)
+    //   valeur = nom d'une commande (string, params.delta/axis/phase transmis à
+    //            command()) OU { type: 'hide' } pour fermer la vue.
+    // Doit refléter le bloc `gestures:` de VIEW.md. Supprimer si inutilisé.
+    //
+    // gestures: {
+    //   pinch_y:    'ma-commande',     // continu — params.delta dans command()
+    //   Victory:    'autre-commande',  // discret
+    //   Thumb_Down: { type: 'hide' },  // discret — ferme la vue
+    // },
+
     /**
      * Affiche la vue.
      * OBLIGATOIRE : doit être idempotent (safe si appelé deux fois sans hide entre).
