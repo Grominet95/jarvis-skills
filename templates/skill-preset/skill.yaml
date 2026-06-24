@@ -7,7 +7,7 @@
 # ── Metadata ──────────────────────────────────────────────────
 name: ma-preset                    # slug kebab-case unique, pas d'espaces
 version: 1.0.0
-author: ton-pseudo-github
+author: ton-pseudo-github          # ton pseudo GitHub — sert à te créditer dans le marketplace
 description: Ce que fait la preset en une phrase claire.
 tags: [preset, tag1, tag2]         # toujours inclure "preset" comme premier tag
 type: preset                       # OBLIGATOIRE pour les presets

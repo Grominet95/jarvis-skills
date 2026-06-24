@@ -6,7 +6,7 @@ id: ma-vue
 # ── Métadonnées ────────────────────────────────────────────────────────────
 name: Ma Vue                                   # Nom affiché dans le marketplace
 version: 1.0.0                                 # semver
-author: ton-pseudo-github
+author: ton-pseudo-github                      # ton pseudo GitHub — sert à te créditer dans le marketplace
 description: Ce que fait la vue en une phrase claire.
 tags: [tag1, tag2]                             # mots-clés pour le filtre
 glyph: MV                                      # 2-4 lettres pour le badge (ex: GLB, MAP, CAM)

@@ -47,7 +47,16 @@ version: 1.0.0
 ...
 ```
 
-### 8. Pour ajouter un nouveau champ de schéma
+### 8. Toujours renseigner `author` avec un vrai pseudo
+Le champ `author` (obligatoire dans les trois types : skill, preset, vue) sert à
+**créditer le contributeur** dans le marketplace. Un agent ne laisse **jamais** le
+placeholder `ton-pseudo-github` du template.
+- Si tu crées la contribution **pour** quelqu'un, demande-lui son pseudo GitHub et
+  inscris-le. En cas de doute, demande — ne devine pas.
+- Une PR dont `author` vaut encore `ton-pseudo-github` (ou est vide) est considérée
+  comme incomplète.
+
+### 9. Pour ajouter un nouveau champ de schéma
 L'ordre est impératif :
 1. Modifier le(s) schéma(s) JSON (`schemas/`)
 2. Mettre à jour la documentation (`SKILLS_STANDARD.md` / etc.)
@@ -69,6 +78,7 @@ Avant de créer une PR, vérifier que :
 - [ ] `python scripts/scan_security.py <chemin>` → zéro CRITIQUE
 - [ ] Aucune clé API, token ou secret dans le code source
 - [ ] `schema_version: "1.0"` présent dans le manifest
+- [ ] `author` renseigné avec un vrai pseudo GitHub (jamais `ton-pseudo-github`)
 - [ ] Contribution testée en réel dans jarvis-OS (Skill Lab)
 
 ---
