@@ -68,8 +68,14 @@ async function loadCatalog() {
     console.warn("[jarvis-skills] index.json fetch failed, using embedded fallback.", e);
     CATALOG = window.JARVIS_FALLBACK;
   }
-  // Normalize: ensure type is set ("skill" if missing)
-  CATALOG.skills = CATALOG.skills.map(s => ({ ...s, type: (s.type || "skill").toLowerCase() }));
+  // index.json expose trois tableaux séparés (skills / presets / views) ;
+  // le fallback (data.js) regroupe tout dans `skills` avec un champ `type`.
+  // On fusionne les deux formes en une seule liste `skills` typée, sans double
+  // comptage (les tableaux absents valent []).
+  const skills  = (CATALOG.skills  || []).map(s => ({ ...s, type: (s.type || "skill").toLowerCase() }));
+  const presets = (CATALOG.presets || []).map(s => ({ ...s, type: "preset" }));
+  const views   = (CATALOG.views   || []).map(s => ({ ...s, type: "view" }));
+  CATALOG.skills = [...skills, ...presets, ...views];
   return CATALOG;
 }
 
