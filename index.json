@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "updated_at": "2026-06-23",
+  "updated_at": "2026-06-24",
   "skills": [
     {
       "name": "bambulab-printer",
@@ -261,23 +261,6 @@
   ],
   "views": [
     {
-      "name": "astronomy",
-      "version": "3.0.0",
-      "author": "Grominet95",
-      "description": "Vrai ciel temps réel — HYG 5000 étoiles, constellations IAU, Voie lactée, DSO, planètes, navigation pan/zoom",
-      "tags": [
-        "astronomie",
-        "ciel",
-        "étoiles",
-        "planètes",
-        "constellations"
-      ],
-      "path": "views/astronomy",
-      "static_files": [],
-      "requires_tools": [],
-      "requires_env": []
-    },
-    {
       "name": "clock",
       "version": "1.0.0",
       "author": "Grominet95",
@@ -311,22 +294,6 @@
       "requires_env": [
         "MAPBOX_TOKEN"
       ]
-    },
-    {
-      "name": "planetarium",
-      "version": "1.0.0",
-      "author": "Grominet95",
-      "description": "Planétarium Stellarium Web — vue réaliste du ciel (embed, design Stellarium)",
-      "tags": [
-        "astronomie",
-        "ciel",
-        "planétarium",
-        "stellarium"
-      ],
-      "path": "views/planetarium",
-      "static_files": [],
-      "requires_tools": [],
-      "requires_env": []
     },
     {
       "name": "system-monitor",

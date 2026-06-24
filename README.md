@@ -61,7 +61,15 @@ Elle s'enregistre via `Jarvis.views.register()` et répond aux events `show_view
 
 | Vue | Description | Variables d'env |
 |-----|-------------|-----------------|
-| [globe](views/globe/) | Globe terrestre interactif avec navigation vocale | `MAPBOX_TOKEN` |
+| [globe](views/globe/) | Globe terrestre interactif — navigation vocale, vols animés, **pilotage gestuel** | `MAPBOX_TOKEN` |
+| [weather](views/weather/) | Météo immersive — ciel animé, conditions et prévisions horaires (Open-Meteo) | |
+| [system-monitor](views/system-monitor/) | Cockpit système temps réel — jauges CPU/RAM/disque, LLM, services, missions | |
+| [clock](views/clock/) | Horloge solaire — cadran 24 h, course du soleil, fuseaux Tokyo/New York/Londres | |
+
+Une vue peut aussi déclarer des **bindings gestuels** (`gestures`) : mapper un
+geste standard MediaPipe (pincement, paume, victoire…) vers une de ses commandes
+quand elle a le focus. La vue déclare une intention, elle ne pilote jamais
+MediaPipe. Le globe est la vue de référence.
 
 Lire [VIEWS_STANDARD.md](VIEWS_STANDARD.md) pour créer sa propre vue.
 Le dossier [views/TEMPLATE/](views/TEMPLATE/) contient un template vide commenté.
@@ -94,6 +102,22 @@ Tu veux ajouter une capacité à Jarvis et la partager ?
 4. **Ouvre une PR** : la CI relance la validation statique automatiquement. Une checklist et une attestation "testé en réel" te sont demandées.
 
 Le détail est dans [CONTRIBUTING.md](CONTRIBUTING.md). Tu contribues en tant qu'agent ? Lis [AGENTS.md](AGENTS.md).
+
+---
+
+## Ressources & documentation
+
+| Document | À quoi ça sert |
+|----------|----------------|
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Parcours de contribution complet (créer, valider, tester, PR) |
+| [AGENTS.md](AGENTS.md) | Règles pour les contributions agentiques (LLM / scripts) |
+| [SKILLS_STANDARD.md](SKILLS_STANDARD.md) | Standard des skills conversationnels |
+| [PRESETS_STANDARD.md](PRESETS_STANDARD.md) | Standard des presets (séquences d'actions) |
+| [VIEWS_STANDARD.md](VIEWS_STANDARD.md) | Standard des vues full-screen + bindings gestuels |
+| [SECURITY.md](SECURITY.md) | Politique de sécurité et signalement |
+| [IDEAS.md](IDEAS.md) | Idées d'extensions à reprendre |
+
+Schémas JSON de validation : [`schemas/`](schemas/) · scripts de validation et d'index : [`scripts/`](scripts/).
 
 ---
 
