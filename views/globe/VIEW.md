@@ -4,8 +4,8 @@ schema_version: "1.0"
 name: Globe
 version: 1.2.1
 author: BarthH95
-description: Globe terrestre interactif temps réel — navigation vocale et vols animés
-tags: [geo, realtime, map, globe, navigation]
+description: Globe terrestre interactif avec navigation, recherche de lieux, zoom, rotation et recentrage.
+tags: [geo, map, globe, navigation]
 glyph: GLB
 requires_env:
   - name: MAPBOX_TOKEN
@@ -18,7 +18,7 @@ commands:
   - action: hide
     description: Masque le globe
   - action: fly_to
-    description: Vol animé vers un lieu ou des coordonnées
+    description: Navigation animée vers un lieu ou des coordonnées
     params:
       location: string   # nom du lieu OU "lat,lon"
       lat: float         # latitude (alternative à location)

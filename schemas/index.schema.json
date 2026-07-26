@@ -96,6 +96,10 @@
         {
           "required": ["requires_tools", "requires_env"],
           "properties": {
+            "view_id": {
+              "type": "string",
+              "description": "Identifiant du dossier ou composant frontend de la vue"
+            },
             "static_files": { "type": "array", "items": { "type": "string" } },
             "requires_tools": { "type": "array", "items": { "type": "string" } },
             "requires_env": { "type": "array", "items": { "type": "string" } }

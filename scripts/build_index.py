@@ -33,6 +33,7 @@ _YAML_PLAIN_SCALAR_RE = re.compile(
     r'^([ \t]*[a-zA-Z_][a-zA-Z0-9_-]*[ \t]*:[ \t]+)([^"\'{|>\[\n][^\n]*)$',
     re.MULTILINE,
 )
+_KEBAB_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 # ── YAML helpers ───────────────────────────────────────────────────────────────
@@ -153,18 +154,32 @@ def _view_entry_from_yaml(dirname: str, data: dict) -> dict:
     }
 
 
-def _view_entry_from_frontmatter(dirname: str, fm: dict) -> dict:
-    return {
-        "name": str(fm.get("id", dirname)),
+def _view_entry_from_frontmatter(
+    dirname: str,
+    fm: dict,
+    package_manifest: Optional[dict] = None,
+) -> dict:
+    frontend_id = str(fm.get("id", dirname))
+    package_name = frontend_id
+    if package_manifest:
+        candidate = package_manifest.get("name")
+        if isinstance(candidate, str) and _KEBAB_ID_RE.fullmatch(candidate):
+            package_name = candidate
+
+    entry = {
+        "name": package_name,
         "version": str(fm.get("version", "")),
         "author": str(fm.get("author", "")),
         "description": str(fm.get("description", "")),
         "tags": _lst(fm.get("tags")),
         "path": f"views/{dirname}",
-        "static_files": [],
-        "requires_tools": [],
+        "static_files": _lst((package_manifest or {}).get("static_files")),
+        "requires_tools": _lst((package_manifest or {}).get("requires_tools")),
         "requires_env": _norm_env(fm.get("requires_env")),
     }
+    if package_name != frontend_id:
+        entry["view_id"] = frontend_id
+    return entry
 
 
 # ── Génération ─────────────────────────────────────────────────────────────────
@@ -193,20 +208,26 @@ def generate() -> dict:
             d for d in VIEWS_DIR.iterdir()
             if d.is_dir() and d.name != "TEMPLATE"
         ):
-            # Priorité VIEW.md → frontmatter officiel
+            yaml_path = view_dir / "skill.yaml"
+            package_manifest = _load_yaml(yaml_path) if yaml_path.exists() else None
+
+            # VIEW.md décrit le frontend ; skill.yaml peut fournir l'identité installable.
             view_md = view_dir / "VIEW.md"
             if view_md.exists():
                 fm = _load_view_frontmatter(view_md)
                 if fm:
-                    views.append(_view_entry_from_frontmatter(view_dir.name, fm))
+                    views.append(
+                        _view_entry_from_frontmatter(
+                            view_dir.name,
+                            fm,
+                            package_manifest,
+                        )
+                    )
                     continue
 
             # Fallback skill.yaml (type: view)
-            yaml_path = view_dir / "skill.yaml"
-            if yaml_path.exists():
-                data = _load_yaml(yaml_path)
-                if data and "name" in data:
-                    views.append(_view_entry_from_yaml(view_dir.name, data))
+            if package_manifest and "name" in package_manifest:
+                views.append(_view_entry_from_yaml(view_dir.name, package_manifest))
 
     return {
         "version": INDEX_FORMAT_VERSION,

@@ -31,13 +31,21 @@ def run(manifest: dict, contribution_type: str, contribution_path: Path) -> tupl
 
     entries = index.get(array_key) or []
 
-    # Pour les vues, l'index utilise le champ 'id' du frontmatter comme 'name'
-    contrib_name = manifest.get("name") or manifest.get("id") or contribution_path.name
-    expected_path = str(contribution_path.relative_to(ROOT))
+    if contribution_type == "view":
+        contrib_name = manifest.get("id") or contribution_path.name
+    else:
+        contrib_name = manifest.get("name") or contribution_path.name
+    expected_path = contribution_path.relative_to(ROOT).as_posix()
 
     # Chercher l'entrée correspondante
     entry = next(
-        (e for e in entries if e.get("name") == contrib_name or e.get("path") == expected_path),
+        (
+            e
+            for e in entries
+            if e.get("name") == contrib_name
+            or e.get("view_id") == contrib_name
+            or e.get("path") == expected_path
+        ),
         None,
     )
 

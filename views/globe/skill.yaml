@@ -1,15 +1,23 @@
 name: globe-view
+schema_version: "1.0"
+view_id: globe
 label: Globe Terrestre
-version: 1.0.0
+version: 1.2.1
 author: BarthH95
-description: "Vue globe terrestre temps réel — navigation vocale, vols en direct, météo, navires."
-tags: [view, globe, map, geo, realtime]
+description: "Vue globe terrestre interactive avec navigation, recherche de lieux, zoom, rotation et recentrage."
+tags: [view, globe, map, geo, navigation]
 type: view
 static_files: []   # vue servie par view.js (canonique) ; legacy static/globe.js+css supprimés
-requires_env: []
+requires_env:
+  - name: MAPBOX_TOKEN
+    description: Token public Mapbox GL JS (commence par "pk.")
+    example: "pk.eyJ1IjoiYmFydGgtOTUiLCJhIjoiY..."
+    sensitive: true
 requires_tools: []
 capabilities:
   - "Afficher le globe terrestre interactif"
-  - "Naviguer vers n'importe quelle ville ou monument (\"montre Lyon\", \"va à Tokyo\")"
-  - "Voir les vols commerciaux en temps réel"
-  - "Zoom vocal, rotation, vue globale"
+  - "Naviguer vers une ville ou un monument"
+  - "Zoomer et dézoomer"
+  - "Faire pivoter la vue"
+  - "Déplacer la vue"
+  - "Recentrer sur une vue globale"

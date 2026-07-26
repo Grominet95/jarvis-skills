@@ -23,6 +23,30 @@ views/
 
 L'ID d'une vue est en **kebab-case minuscule** : `globe`, `star-map`, `weather-radar`.
 
+### Identité du package et du frontend
+
+`VIEW.md.id` est l'identifiant frontend de la vue : il correspond à
+`Jarvis.views.register(id, …)` et détermine le dossier statique servi par Jarvis.
+
+Une vue peut aussi fournir un `skill.yaml` lorsqu'elle est distribuée sous un nom
+de package installable différent. Dans ce cas, `skill.yaml.name` est l'identité
+du package et du registre, tandis que `VIEW.md.id` reste l'identité frontend.
+L'index généré expose alors les deux valeurs :
+
+```yaml
+name: globe-view
+view_id: globe
+path: views/globe
+```
+
+Ici, le package est installé et chargé dans le registre sous `globe-view`, alors
+que ses fichiers frontend sont servis depuis le dossier dérivé de `view_id`,
+`static/skills/globe`.
+
+Pour une vue simple, `skill.yaml.name` et `VIEW.md.id` restent identiques par
+défaut ; le générateur n'ajoute pas de `view_id` redondant. Ne pas ajouter
+`view_id` à `VIEW.md` : le champ `id` remplit déjà ce rôle.
+
 ---
 
 ## Format `VIEW.md`

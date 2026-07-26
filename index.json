@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "updated_at": "2026-06-24",
+  "updated_at": "2026-07-26",
   "skills": [
     {
       "name": "bambulab-printer",
@@ -277,13 +277,12 @@
       "requires_env": []
     },
     {
-      "name": "globe",
+      "name": "globe-view",
       "version": "1.2.1",
       "author": "BarthH95",
-      "description": "Globe terrestre interactif temps réel — navigation vocale et vols animés",
+      "description": "Globe terrestre interactif avec navigation, recherche de lieux, zoom, rotation et recentrage.",
       "tags": [
         "geo",
-        "realtime",
         "map",
         "globe",
         "navigation"
@@ -293,7 +292,8 @@
       "requires_tools": [],
       "requires_env": [
         "MAPBOX_TOKEN"
-      ]
+      ],
+      "view_id": "globe"
     },
     {
       "name": "system-monitor",
